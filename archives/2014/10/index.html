@@ -62,7 +62,7 @@
   <header>
     
       <div class="icon"></div>
-      <a href="/2014/10/27/Docker-In-Action-һ/">
+      <a href="/2014/10/27/Docker-In-Actiondocker-ssh/">
   <time datetime="2014-10-27T14:02:50.000Z">
     10月 27 2014
   </time>
@@ -70,14 +70,55 @@
     
     
   
-    <h1 class="title"><a href="/2014/10/27/Docker-In-Action-һ/">Docker In Action&lt;一&gt; 制作可以SSH登录的docker容器服务指北</a></h1>
+    <h1 class="title"><a href="/2014/10/27/Docker-In-Actiondocker-ssh/">Docker In Action&lt;一&gt; 制作可以SSH登录的docker容器服务指北</a></h1>
   
 
   </header>
   
   <div class="entry">
     
-      
+      <p><a href="http://www.docker.com" target="_blank" rel="external">Docker</a>官网 的示例中基本上采用的是Ubuntu来作为环境的，但大部分企业相比来说还是采用RedHat/CentOS 系列的比较多，故这里整理了一篇从yum源方式制作自己干净简单的Docker镜像开始，一步一步构建具有SSH功能，Java/Tomcat环境，用Supervisor来启动并监控服务，最后构建具有Oracle等企业应用服务的完整Docker镜像。</p>
+<h2 id="环境准备">环境准备</h2>
+<h3 id="Mac环境">Mac环境</h3>
+<p>我的电脑是Mac OS X，故使用brew来安装 boot2docker 来运行docker，安装过程中会从亚马逊下载boot2docker ISO镜像，需要用VPN翻墙。</p>
+<p>启动boot2docker</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">boot2docker start <span class="comment">#启动boot2dokcer,并根据提示设置环境变量</span></div></pre></td></tr></table></figure>
+
+
+
+<p>然后查看下docker的版本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">MacBookPro:hzchenkj.github.io hzchenkj$ docker  version</div><div class="line">Client version: <span class="number">1.3</span>.<span class="number">0</span></div><div class="line">Client API version: <span class="number">1.15</span></div><div class="line">Go version (client): go1.<span class="number">3.3</span></div><div class="line">Git commit (client): c78088f</div><div class="line">OS/Arch (client): darwin/amd64</div><div class="line">Server version: <span class="number">1.3</span>.<span class="number">0</span></div><div class="line">Server API version: <span class="number">1.15</span></div><div class="line">Go version (server): go1.<span class="number">3.3</span></div><div class="line">Git commit (server): c78088f</div></pre></td></tr></table></figure>
+
+<h3 id="Linux环境（CentOS）">Linux环境（CentOS）</h3>
+<p>1 配置epel yum,使用国内的repo访问速度比较快</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> /etc/yum.repos.d/</div><div class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-<span class="number">6</span>.repo </div><div class="line">rpm -ivh http://mirrors.aliyun.com/epel/<span class="number">6</span>Server/x86_64/epel-release-<span class="number">6</span>-<span class="number">8</span>.noarch.rpm</div></pre></td></tr></table></figure>
+
+
+<p>2 yum更新</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum clean all && yum makecache && yum update -y</div></pre></td></tr></table></figure>
+
+
+<p>3 安装docker并启动docker服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">yum install docker-io</div><div class="line">service docker start </div><div class="line">chkconfig docker on</div><div class="line">docker version</div></pre></td></tr></table></figure>
+
+
+
+<h2 id="构建CentOS基础镜像">构建CentOS基础镜像</h2>
+<p>1 使用febootstrap从yum源 构建简洁的CentOS 镜像</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">yum -y install febootstrap </div><div class="line"><span class="comment">#centos6-image目录</span></div><div class="line">febootstrap -i bash -i wget -i supervisor -i yum -i iputils -i iproute -i man -i vim-minimal -i openssh-server -i openssh-clients centos65 centos65-image http://mirrors.aliyun.com/centos/<span class="number">6.5</span>/os/x86_64/</div></pre></td></tr></table></figure>
+
+
+<h1 id="制作Docker镜像，镜像名字是centos6-base">制作Docker镜像，镜像名字是centos6-base</h1>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> centos65-image && tar -c .|docker import - centos65-base</div></pre></td></tr></table></figure>
+
+
+<h1 id="查看镜像列表">查看镜像列表</h1>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker images</div></pre></td></tr></table></figure>
+
+
+
+
+
     
   </div>
   <footer class="end-sep">
@@ -103,16 +144,16 @@
     
     
   
-    <h1 class="title"><a href="/2014/10/27/hello-world/">���� Hello World</a></h1>
+    <h1 class="title"><a href="/2014/10/27/hello-world/">Hello World 中文文章测试</a></h1>
   
 
   </header>
   
   <div class="entry">
     
-      <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">trobuleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick_Start">Quick Start</h2>
-<h3 id="Create_a_new_post">Create a new post</h3>
+      <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">trobuleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>. 欢迎大家来到LinuxCoffee的博客。该博客使用Hexo生成。并将文章发布到GitHub上。</p>
+<h2 id="入门指南">入门指南</h2>
+<h3 id="发表新的文章">发表新的文章</h3>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
 
 <p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
