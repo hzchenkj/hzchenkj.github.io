@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>Docker In Action&lt;一&gt; 制作可以Oracle的docker容器服务指北 | LinuxCoffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="hzchenkj">
+  
+  
+    <meta name="description" content="本篇记录一步一步从docker 镜像centos65-ssh 开始构建Oracle服务的过程。由于一般的Oracle安装需要图形界面，安装比较复杂，所以本初采用Oracle提供的另外一种安装方式静默安装来构建。
+123456789mkdir ~/docker/oracletouch ~/docker/oracle/Dockerfilecd /usr/local/src#下载Oracle datab">
+  
+  <meta name="description" content="本篇记录一步一步从docker 镜像centos65-ssh 开始构建Oracle服务的过程。由于一般的Oracle安装需要图形界面，安装比较复杂，所以本初采用Oracle提供的另外一种安装方式静默安装来构建。
+123456789mkdir ~/docker/oracletouch ~/docker/oracle/Dockerfilecd /usr/local/src#下载Oracle datab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker In Action<一> 制作可以Oracle的docker容器服务指北">
+<meta property="og:url" content="http://hzchenkj.github.com/2014/10/31/Docker-In-Action-docker-oracle/">
+<meta property="og:site_name" content="LinuxCoffee">
+<meta property="og:description" content="本篇记录一步一步从docker 镜像centos65-ssh 开始构建Oracle服务的过程。由于一般的Oracle安装需要图形界面，安装比较复杂，所以本初采用Oracle提供的另外一种安装方式静默安装来构建。
+123456789mkdir ~/docker/oracletouch ~/docker/oracle/Dockerfilecd /usr/local/src#下载Oracle datab">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker In Action<一> 制作可以Oracle的docker容器服务指北">
+<meta name="twitter:description" content="本篇记录一步一步从docker 镜像centos65-ssh 开始构建Oracle服务的过程。由于一般的Oracle安装需要图形界面，安装比较复杂，所以本初采用Oracle提供的另外一种安装方式静默安装来构建。
+123456789mkdir ~/docker/oracletouch ~/docker/oracle/Dockerfilecd /usr/local/src#下载Oracle datab">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LinuxCoffee</a></h1>
+    <p><a href="/">东写西读</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+        <li><a href="/reading">Reading</a></li>
+      
+        <li><a href="/about">About</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content"><article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2014/10/31/Docker-In-Action-docker-oracle/">
+  <time datetime="2014-10-31T01:30:08.000Z">
+    10月 31 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title">Docker In Action&lt;一&gt; 制作可以Oracle的docker容器服务指北</h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>本篇记录一步一步从docker 镜像centos65-ssh 开始构建Oracle服务的过程。由于一般的Oracle安装需要图形界面，安装比较复杂，所以本初采用Oracle提供的另外一种安装方式静默安装来构建。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mkdir ~/docker/oracle</div><div class="line">touch ~/docker/oracle/Dockerfile</div><div class="line"><span class="built_in">cd</span> /usr/local/src</div><div class="line"><span class="comment">#下载Oracle database安装介质</span></div><div class="line">wget <span class="number">10201</span>_database_linux_x86_64.cpio.gz</div><div class="line"><span class="comment">#解压缩，生成database目录</span></div><div class="line">zcat <span class="number">10201</span>_database_linux_x86_64.cpio.gz |cpio -idmv</div><div class="line"><span class="comment">#删除</span></div><div class="line">rm -rf <span class="number">10201</span>_database_linux_x86_64.cpio.gz</div></pre></td></tr></table></figure>
+
+<p>Dockerfile</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#prepare install oracle env</span></div><div class="line">FROM centos65-ssh</div><div class="line">RUN yum -y install lftp binutils compat-gcc-* compat-gcc-*-c++ compat-libstdc++-*  \</div><div class="line">    control-center gcc gcc-c++ glibc glibc-common libstdc++ libstdc++-devel  \</div><div class="line">    make pdksh openmotif setarch sysstat glibc-devel libgcc libaio compat-db \</div><div class="line">    libXtst libXp libXp.i686 libXt.i686 libXtst.i686   && rm -rf /var/cache/yum </div><div class="line"><span class="comment">##create Oracle group and user</span></div><div class="line">RUN groupadd -g <span class="number">505</span> oinstall && groupadd -g <span class="number">506</span> dba  && useradd -u <span class="number">505</span> -m -g oinstall -G dba oracle && id oracle</div><div class="line"><span class="comment">##config profile</span></div><div class="line">ENV ORACLE_APP /u01/app/oracle</div><div class="line">ENV ORACLE_DATA /u02/oradata</div><div class="line">ENV ORACLE_HOME <span class="variable">$ORACLE_APP</span>/product/<span class="number">10.2</span>.<span class="number">0</span>/db_1</div><div class="line">ENV <span class="variable">$INSTALL_HOME</span> /usr/local/src</div><div class="line">RUN mkdir -p <span class="variable">$ORACLE_APP</span> <span class="variable">$ORACLE_DATA</span> && chown -R oracle:oinstall <span class="variable">$ORACLE_APP</span> <span class="variable">$ORACLE_DATA</span> && chmod -R <span class="number">775</span> <span class="variable">$ORACLE_APP</span> <span class="variable">$ORACLE_DATA</span></div><div class="line">RUN cp /etc/redhat-release /etc/redhat-release.orig && <span class="built_in">echo</span> <span class="string">"redhat-4"</span> &gt; /etc/redhat-release</div><div class="line">ADD install.sh  <span class="variable">$INSTALL_HOME</span>/install.sh</div><div class="line">ADD createdb.sh <span class="variable">$INSTALL_HOME</span>/createdb.sh</div><div class="line">ADD initcenter.ora <span class="variable">$INSTALL_HOME</span>/initcenter.ora</div><div class="line">ADD supervisord.conf /etc/supervisord.conf</div><div class="line">EXPOSE <span class="number">1521</span></div></pre></td></tr></table></figure>
+
+<p>install.sh</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line"><span class="shebang">#!/bin/bash</span></div><div class="line"><span class="comment">##config  Linux kernel</span></div><div class="line">cat &gt;&gt; /etc/sysctl.conf &lt;&lt;EOF</div><div class="line"><span class="comment">#use for oracle</span></div><div class="line">kernel.shmall = <span class="number">2097152</span></div><div class="line">kernel.shmmax = <span class="number">20147483648</span></div><div class="line">kernel.shmmni = <span class="number">4096</span></div><div class="line">kernel.sem = <span class="number">250</span> <span class="number">32000</span> <span class="number">100</span> <span class="number">128</span></div><div class="line"><span class="comment">#fs.file-max = 65536</span></div><div class="line">net.ipv4.ip_local_port_range = <span class="number">9000</span> <span class="number">65500</span></div><div class="line">net.core.rmem_default=<span class="number">1048576</span></div><div class="line">net.core.rmem_max=<span class="number">1048576</span></div><div class="line">net.core.wmem_default=<span class="number">262144</span></div><div class="line">net.core.wmem_max=<span class="number">262144</span></div><div class="line">EOF</div><div class="line">/sbin/sysctl -p</div><div class="line"><span class="comment">#config oracle user limit</span></div><div class="line">cat &gt;&gt; /etc/security/limits.conf &lt;&lt;EOF</div><div class="line"><span class="comment">#use for oracle</span></div><div class="line">oracle soft nproc <span class="number">2047</span></div><div class="line">oracle hard nproc <span class="number">16384</span></div><div class="line">oracle soft nofile <span class="number">4096</span></div><div class="line">oracle hard nofile <span class="number">65536</span></div><div class="line">EOF</div><div class="line"><span class="comment">#oralce limits login</span></div><div class="line">cat &gt;&gt; /etc/pam.d/login &lt;&lt;EOF</div><div class="line"><span class="comment">#session required /lib64/security/pam_limits.so</span></div><div class="line">EOF</div><div class="line"><span class="comment">#oracle profile</span></div><div class="line">cat &gt;&gt; /etc/profile &lt;&lt;EOF</div><div class="line"><span class="keyword">if</span> [ \<span class="variable">$USER</span> = <span class="string">"oracle"</span> ]; <span class="keyword">then</span></div><div class="line">    <span class="keyword">if</span> [ \<span class="variable">$SHELL</span> = <span class="string">"/bin/ksh"</span> ]; <span class="keyword">then</span></div><div class="line">        ulimit -p <span class="number">16384</span></div><div class="line">        ulimit -n <span class="number">65536</span></div><div class="line">    <span class="keyword">else</span></div><div class="line">        ulimit -u <span class="number">16384</span> -n <span class="number">65536</span></div><div class="line">    <span class="keyword">fi</span></div><div class="line">    umask <span class="number">022</span></div><div class="line"><span class="keyword">fi</span></div><div class="line">EOF</div><div class="line"><span class="comment">#oracle login</span></div><div class="line">cat &gt;&gt; /etc/csh.login &lt;&lt;EOF</div><div class="line"><span class="keyword">if</span> ( \<span class="variable">$USER</span> == <span class="string">"oracle"</span> ) <span class="keyword">then</span></div><div class="line">    limit maxproc <span class="number">16384</span></div><div class="line">    limit descriptors <span class="number">65536</span></div><div class="line">    umask <span class="number">022</span></div><div class="line">endif</div><div class="line">EOF</div><div class="line"><span class="comment">##oracle profile</span></div><div class="line">cat &gt;&gt; /home/oracle/.bash_profile &lt;&lt;EOF</div><div class="line"><span class="keyword">export</span> ORACLE_BASE=<span class="variable">$ORACLE_APP</span></div><div class="line"><span class="keyword">export</span> ORACLE_HOME=\<span class="variable">$ORACLE_BASE</span>/product/<span class="number">10.2</span>.<span class="number">0</span>/db_1</div><div class="line"><span class="keyword">export</span> ORACLE_SID=center</div><div class="line"><span class="keyword">export</span> PATH=\<span class="variable">$PATH</span>:\<span class="variable">$ORACLE_HOME</span>/bin:\<span class="variable">$HOME</span>/bin</div><div class="line"><span class="keyword">export</span> LD_LIBRARY_PATH=\<span class="variable">$LD_LIBRARY_PATH</span>:\<span class="variable">$ORACLE_HOME</span>/lib:/usr/lib:/usr/local/lib</div><div class="line"><span class="keyword">export</span> NLS_LANG=AMERICAN_AMERICA.ZHS16GBK</div><div class="line">EOF</div><div class="line"><span class="comment">## oracle silent install</span></div><div class="line">su - oracle -c <span class="string">"<span class="variable">$INSTALL_HOME</span>/database/runInstaller -silent -responseFile <span class="variable">$INSTALL_HOME</span>/database/response/enterprise.rsp \</span></div><div class="line">UNIX_GROUP_NAME="oinstall<span class="string">" ORACLE_HOME="</span>/u01/app/oracle/product/<span class="number">10.2</span>.<span class="number">0</span>/db_1<span class="string">" \</span></div><div class="line">ORACLE_HOME_NAME="OraDb10g_home1<span class="string">" s_nameForDBAGrp="</span>dba<span class="string">" s_nameForOPERGrp="</span>dba<span class="string">" n_configurationOption=3 "</span></div><div class="line"><span class="comment">#restore release </span></div><div class="line">rm /etc/redhat-release</div><div class="line">cp /etc/redhat-release.orig /etc/redhat-release</div><div class="line"><span class="built_in">echo</span> <span class="string">"##########################################"</span></div><div class="line"><span class="built_in">echo</span> <span class="string">'success install oracle software'</span></div></pre></td></tr></table></figure>
+
+
+
+<p>initcenter.ora</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">*.compatible=<span class="string">'10.2.0.1.0'</span></div><div class="line">*G._kgl_large_heap_warning_threshold=<span class="number">83886080</span></div><div class="line">*.audit_file_dest=<span class="string">'/u02/oradata/admin/center/adump'</span></div><div class="line">*.background_dump_dest=<span class="string">'/u02/oradata/admin/center/bdump'</span></div><div class="line">*.control_files=<span class="string">'/u02/oradata/center/control01.ctl'</span>,<span class="string">'/u02/oradata/center/control02.ctl'</span></div><div class="line">*.core_dump_dest=<span class="string">'/u02/oradata/admin/center/cdump'</span></div><div class="line">*.user_dump_dest=<span class="string">'/u02/oradata/admin/center/udump'</span></div><div class="line">*.db_2k_cache_size=<span class="number">33554432</span></div><div class="line">*.db_block_size=<span class="number">8192</span></div><div class="line">*.db_domain=<span class="string">''</span></div><div class="line">*.db_file_multiblock_<span class="built_in">read</span>_count=<span class="number">128</span></div><div class="line">*.db_files=<span class="number">4000</span></div><div class="line">*.db_name=<span class="string">'center'</span></div><div class="line">*.db_recovery_file_dest_size=<span class="number">4294967296</span></div><div class="line">*.db_recovery_file_dest=<span class="string">''</span></div><div class="line">*.log_archive_dest=<span class="string">'/u02/oradata/center/archive'</span></div><div class="line">*.log_checkpoints_to_alert=FALSE</div><div class="line">*.open_cursors=<span class="number">1000</span></div><div class="line">*.parallel_execution_message_size=<span class="number">65535</span></div><div class="line">*.parallel_max_servers=<span class="number">128</span></div><div class="line">*.pga_aggregate_target=<span class="number">209715200</span></div><div class="line">*.processes=<span class="number">1000</span></div><div class="line">*.recyclebin=<span class="string">'ON'</span></div><div class="line">*.remote_login_passwordfile=<span class="string">'EXCLUSIVE'</span></div><div class="line">*.replication_dependency_tracking=FALSE</div><div class="line">*.session_cached_cursors=<span class="number">100</span></div><div class="line">*.sga_target=<span class="number">2048</span>m</div><div class="line">*.undo_management=<span class="string">'AUTO'</span></div><div class="line">*.undo_retention=<span class="number">0</span></div><div class="line">*.undo_tablespace=<span class="string">'UNDOTS'</span></div><div class="line">*.workarea_size_policy=<span class="string">'AUTO'</span></div><div class="line">_allow_resetlogs_corruption=<span class="literal">true</span></div><div class="line">*.job_queue_processes=<span class="number">10</span></div></pre></td></tr></table></figure>
+
+
+
+<p>createdb.sh</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># create oracle db </span></div><div class="line">chown -R oracle:oinstall /u02</div><div class="line">su - oracle -c <span class="string">'mkdir -p /u01/app/oracle/product/10.2.0/db_1/dbs'</span></div><div class="line">su - oracle -c <span class="string">'mkdir -p /u02/oradata/admin/center/adump'</span></div><div class="line">su - oracle -c <span class="string">'mkdir -p /u02/oradata/admin/center/bdump'</span></div><div class="line">su - oracle -c <span class="string">'mkdir -p /u02/oradata/admin/center/cdump'</span></div><div class="line">su - oracle -c <span class="string">'mkdir -p /u02/oradata/admin/center/pfile'</span></div><div class="line">su - oracle -c <span class="string">'mkdir -p /u02/oradata/admin/center/udump'</span></div><div class="line">su - oracle -c <span class="string">'mkdir -p /u02/oradata/center'</span></div><div class="line">su - oracle -c <span class="string">'mkdir -p /u02/oradata/center/archive'</span></div><div class="line"><span class="comment">#cp initcenter.ora </span></div><div class="line">cp <span class="variable">$INSTALL_HOME</span>/initcenter.ora /u02/oradata/admin/center/pfile</div><div class="line">cp <span class="variable">$INSTALL_HOME</span>/initcenter.ora /u01/app/oracle/product/<span class="number">10.2</span>.<span class="number">0</span>/db_1/dbs</div><div class="line">chown oracle:oinstall /u02/oradata/admin/center/pfile/initcenter.ora</div><div class="line">chmod a+x /u02/oradata/admin/center/pfile/initcenter.ora</div><div class="line">chown oracle:oinstall /u01/app/oracle/product/<span class="number">10.2</span>.<span class="number">0</span>/db_1/dbs/initcenter.ora</div><div class="line">chmod a+x /u01/app/oracle/product/<span class="number">10.2</span>.<span class="number">0</span>/db_1/dbs/initcenter.ora</div><div class="line"><span class="built_in">echo</span> <span class="string">'success cp file ,begin to sqlplus ...'</span></div><div class="line"><span class="comment">#config sys</span></div><div class="line"><span class="built_in">echo</span> <span class="number">506</span> &gt; /proc/sys/vm/hugetlb_shm_group</div><div class="line"><span class="comment">#sqlplus start centerinstatnce</span></div><div class="line">su - oracle -c <span class="string">'sqlplus / as sysdba'</span> &lt;&lt; EOF</div><div class="line">startup nomount pfile=/u02/oradata/admin/center/pfile/initcenter.ora</div><div class="line">EOF</div><div class="line"><span class="built_in">echo</span> <span class="string">'sucecess startup database in nomount state'</span></div><div class="line"><span class="comment">#sqlplus database</span></div><div class="line">su - oracle -c <span class="string">'sqlplus / as sysdba'</span> &lt;&lt; EOF</div><div class="line">CREATE DATABASE center</div><div class="line">LOGFILE</div><div class="line">GROUP <span class="number">1</span> (<span class="string">'/u02/oradata/center/redo01.log'</span>,<span class="string">'/u02/oradata/center/redo01_1.log'</span>) size <span class="number">50</span>m reuse,</div><div class="line">GROUP <span class="number">2</span> (<span class="string">'/u02/oradata/center/redo02.log'</span>,<span class="string">'/u02/oradata/center/redo02_1.log'</span>) size <span class="number">50</span>m reuse,</div><div class="line">GROUP <span class="number">3</span> (<span class="string">'/u02/oradata/center/redo03.log'</span>,<span class="string">'/u02/oradata/center/redo03_1.log'</span>) size <span class="number">50</span>m reuse</div><div class="line">MAXLOGFILES <span class="number">50</span></div><div class="line">MAXLOGMEMBERS <span class="number">5</span></div><div class="line">MAXLOGHISTORY <span class="number">200</span></div><div class="line">MAXDATAFILES <span class="number">50</span></div><div class="line">MAXINSTANCES <span class="number">5</span></div><div class="line">CHARACTER SET ZHS16GBK</div><div class="line">NATIONAL CHARACTER SET AL16UTF16</div><div class="line">DATAFILE <span class="string">'/u02/oradata/center/system01.dbf'</span> SIZE <span class="number">50</span>M autoextend on next <span class="number">10</span>M maxsize <span class="number">1024</span>M</div><div class="line">SYSAUX DATAFILE <span class="string">'/u02/oradata/center/sysaux01.dbf'</span> SIZE <span class="number">50</span>M autoextend on next <span class="number">10</span>M maxsize <span class="number">1024</span>M</div><div class="line">UNDO TABLESPACE UNDOTS DATAFILE <span class="string">'/u02/oradata/center/undo.dbf'</span> SIZE <span class="number">50</span>M autoextend on next <span class="number">10</span>M maxsize <span class="number">1024</span>M </div><div class="line">DEFAULT TEMPORARY TABLESPACE TEMP TEMPFILE <span class="string">'/u02/oradata/center/temp.dbf'</span> SIZE <span class="number">50</span>M autoextend on next <span class="number">10</span>M maxsize <span class="number">1024</span>M;</div><div class="line">@/u01/app/oracle/product/<span class="number">10.2</span>.<span class="number">0</span>/db_1/rdbms/admin/catalog.sql</div><div class="line">@/u01/app/oracle/product/<span class="number">10.2</span>.<span class="number">0</span>/db_1/rdbms/admin/catproc.sql</div><div class="line">conn system/manager</div><div class="line">@/u01/app/oracle/product/<span class="number">10.2</span>.<span class="number">0</span>/db_1/sqlplus/admin/pupbld.sql</div><div class="line">EOF</div><div class="line"><span class="comment">#open database archive</span></div><div class="line">su - oracle -c <span class="string">'sqlplus / as sysdba'</span> &lt;&lt; EOF</div><div class="line">shutdown immediate;</div><div class="line">startup mount;    </div><div class="line">alter database archivelog; </div><div class="line">alter database open;   </div><div class="line">archive log list;   </div><div class="line">EOF</div></pre></td></tr></table></figure>
+
+
+
+<p>supervisord.conf</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[supervisord]</div><div class="line">nodaemon=<span class="literal">true</span></div><div class="line">[program:sshd]</div><div class="line">command=/usr/sbin/sshd -D</div><div class="line">[program:oracle]</div><div class="line">command=su - oracle -c <span class="string">'lsnrctl start '</span> && su - oracle -c <span class="string">'sqlplus / as sysdba'</span> &lt;&lt; EOF</div><div class="line">startup </div><div class="line">EOF</div></pre></td></tr></table></figure>
+
+
+<h1 id="构建oracle_安装环境">构建oracle 安装环境</h1>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker  build -t centos65-oracle:env .</div></pre></td></tr></table></figure>
+
+
+<h1 id="安装oracle软件">安装oracle软件</h1>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#启动前面构建的Oracle安装环境 --privileged=true 参数表示一些sys kernel配置可以写 ，映射database 目录</span></div><div class="line">centos65-oracle]<span class="comment"># docker run -it --privileged=true -v /usr/local/src/database:/usr/local/src/database centos65-oracle:env /bin/bash</span></div><div class="line">bash-<span class="number">4.1</span><span class="comment"># cd /usr/local/src/</span></div><div class="line">bash-<span class="number">4.1</span><span class="comment"># ls</span></div><div class="line">createdb.sh  database  initcenter.ora  install.sh</div><div class="line">bash-<span class="number">4.1</span><span class="comment"># sh install.sh </span></div><div class="line"><span class="comment">#./install.sh </span></div><div class="line"><span class="comment">#rm -rf /usr/local/src/database</span></div><div class="line">docker commit  &lt;cid&gt; centos65-oracle:soft</div><div class="line"><span class="comment">#创建oracle实例</span></div><div class="line">docker  run -it --privileged=<span class="literal">true</span> -v /opt/data/oracle/data1:/u02/oradata/  centos65-oracle:soft /bin/bash</div><div class="line">chmod +x /usr/local/src/createdb.sh</div><div class="line">chown -R oracle:oinstall /u02/oradata</div><div class="line">sh /usr/local/src/createdb.sh</div><div class="line">docker commit  &lt;cid&gt; centos6-oracle:center</div></pre></td></tr></table></figure>
+
+
+<p>运行oracle容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker  run <span class="operator">-d</span> -P  --privileged=<span class="literal">true</span> -v /opt/data/oracle/data1:/u02/oradata/  centos65-oracle:center</div></pre></td></tr></table></figure>
+
+
+
+    
+  </div>
+  <footer>
+    
+      
+      
+  <div class="tags">
+    <a class="tags-link" href="/tags/docker-oracle/">docker oracle</a>
+  </div>
+
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="Docker In Action&lt;一&gt; 制作可以Oracle的docker容器服务指北">
+  </div>
+</section>
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2014 <a href="/">hzchenkj</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="http://ajax.useso.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'hzchenkj' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>
