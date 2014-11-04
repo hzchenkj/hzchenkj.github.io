@@ -78,6 +78,7 @@
   <div class="entry">
     
       <p>本篇记录一步一步从docker 镜像centos65-ssh 开始构建Oracle服务的过程。由于一般的Oracle安装需要图形界面，安装比较复杂，所以本初采用Oracle提供的另外一种安装方式静默安装来构建。</p>
+<p><img src="http://hzchenkj-github-io.qiniudn.com/oracle-java.jpg" alt="Oracle"></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mkdir ~/docker/oracle</div><div class="line">touch ~/docker/oracle/Dockerfile</div><div class="line"><span class="built_in">cd</span> /usr/local/src</div><div class="line"><span class="comment">#下载Oracle database安装介质</span></div><div class="line">wget <span class="number">10201</span>_database_linux_x86_64.cpio.gz</div><div class="line"><span class="comment">#解压缩，生成database目录</span></div><div class="line">zcat <span class="number">10201</span>_database_linux_x86_64.cpio.gz |cpio -idmv</div><div class="line"><span class="comment">#删除</span></div><div class="line">rm -rf <span class="number">10201</span>_database_linux_x86_64.cpio.gz</div></pre></td></tr></table></figure>
 
 <p>Dockerfile</p>

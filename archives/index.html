@@ -76,6 +76,7 @@
   <div class="entry">
     
       <p>本篇记录一步一步从docker 镜像centos65-ssh 开始构建Oracle服务的过程。由于一般的Oracle安装需要图形界面，安装比较复杂，所以本初采用Oracle提供的另外一种安装方式静默安装来构建。</p>
+<p><img src="http://hzchenkj-github-io.qiniudn.com/oracle-java.jpg" alt="Oracle"></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">mkdir ~/docker/oracle</div><div class="line">touch ~/docker/oracle/Dockerfile</div><div class="line"><span class="built_in">cd</span> /usr/local/src</div><div class="line"><span class="comment">#下载Oracle database安装介质</span></div><div class="line">wget <span class="number">10201</span>_database_linux_x86_64.cpio.gz</div><div class="line"><span class="comment">#解压缩，生成database目录</span></div><div class="line">zcat <span class="number">10201</span>_database_linux_x86_64.cpio.gz |cpio -idmv</div><div class="line"><span class="comment">#删除</span></div><div class="line">rm -rf <span class="number">10201</span>_database_linux_x86_64.cpio.gz</div></pre></td></tr></table></figure>
 
 <p>Dockerfile</p>
@@ -145,7 +146,8 @@
   
   <div class="entry">
     
-      <p>本篇基于前面文章<a href="http://hzchenkj.github.io/2014/10/27/Docker-In-Action-docker-ssh/" target="_blank" rel="external">Docker In Action&lt;一&gt; 制作可以SSH登录的docker容器服务指北</a>生成的centos65-ssh开始制作web服务器，使用httpd或者Tomcat来提供web服务（使用supervisor和volumn 方式来制作服务)。</p>
+      <p><img src="http://hzchenkj-github-io.qiniudn.com/tomcat.png" alt="Apache Tomcat"></p>
+<p>本篇基于前面文章<a href="http://hzchenkj.github.io/2014/10/27/Docker-In-Action-docker-ssh/" target="_blank" rel="external">Docker In Action&lt;一&gt; 制作可以SSH登录的docker容器服务指北</a>生成的centos65-ssh开始制作web服务器，使用httpd或者Tomcat来提供web服务（使用supervisor和volumn 方式来制作服务)。</p>
 <h2 id="构建httpd_web服务器">构建httpd web服务器</h2>
 <p>一、构建http web服务容器</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mkdir -p ~/docker/webserver</div><div class="line"><span class="built_in">cd</span> ~/docker/webserver</div></pre></td></tr></table></figure>
@@ -245,7 +247,7 @@
   
   <div class="entry">
     
-      <p><a href="http://www.docker.com" target="_blank" rel="external">Docker</a>官网 的示例中基本上采用的是Ubuntu来作为环境的，但大部分企业相比来说还是采用RedHat/CentOS 系列的比较多，故这里整理了一篇从yum源方式制作自己干净简单的Docker镜像开始，一步一步构建具有SSH功能，Java/Tomcat环境，用Supervisor来启动并监控服务，最后构建具有Oracle等企业应用服务的完整Docker镜像。</p>
+      <p><img src="http://hzchenkj-github-io.qiniudn.com/docker-logo.png" alt="docker-logo"><br><a href="http://www.docker.com" target="_blank" rel="external">Docker</a>官网 的示例中基本上采用的是Ubuntu来作为环境的，但大部分企业相比来说还是采用RedHat/CentOS 系列的比较多，故这里整理了一篇从yum源方式制作自己干净简单的Docker镜像开始，一步一步构建具有SSH功能，Java/Tomcat环境，用Supervisor来启动并监控服务，最后构建具有Oracle等企业应用服务的完整Docker镜像。</p>
 <h2 id="环境准备">环境准备</h2>
 <h3 id="Mac环境">Mac环境</h3>
 <p>我的电脑是Mac OS X，故使用brew来安装 <a href="http://boot2docker.io/" target="_blank" rel="external">Boot2docker</a> 来运行docker，安装过程中会从亚马逊下载Boot2docker ISO镜像，需要用VPN翻墙。另前期需要安装好<a href="https://www.virtualbox.org/" target="_blank" rel="external">VirtuBox</a>这个虚拟机软件。</p>
@@ -270,7 +272,14 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">yum install docker-io</div><div class="line">service docker start </div><div class="line">chkconfig docker on</div><div class="line">docker version </div><div class="line">[root@master ~]<span class="comment"># docker version</span></div><div class="line">Client version: <span class="number">1.1</span>.<span class="number">2</span></div><div class="line">Client API version: <span class="number">1.13</span></div><div class="line">Go version (client): go1.<span class="number">2.2</span></div><div class="line">Git commit (client): d84a070/<span class="number">1.1</span>.<span class="number">2</span></div><div class="line">Server version: <span class="number">1.1</span>.<span class="number">2</span></div><div class="line">Server API version: <span class="number">1.13</span></div><div class="line">Go version (server): go1.<span class="number">2.2</span></div><div class="line">Git commit (server): d84a070/<span class="number">1.1</span>.<span class="number">2</span></div></pre></td></tr></table></figure>
 
 
+
 <hr>
+<h2 id="测试docker">测试docker</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#run a simple echo command, that will echo hello world back to the console over standard out.</span></div><div class="line">$ docker run base /bin/<span class="built_in">echo</span> hello world</div><div class="line">hello world</div></pre></td></tr></table></figure>
+
+
+<p>看起来简单，但后台做了很多的事情：<br>1 Generated a new LXC container<br>2 Created a new file system<br>3 Mounted a read/write layer<br>4 Allocated network interface<br>5 Setup IP<br>6 Setup NATing<br>7 Executed the process in the container<br>8 Captured it’s output<br>9 Printed to screen</p>
+<h2 id="10_Stopped_the_container">10 Stopped the container</h2>
 <h2 id="构建CentOS基础镜像">构建CentOS基础镜像</h2>
 <p>使用 febootstrap 从yum源 构建简洁的CentOS 镜像 (由于Mac上没有febootstrap，在Linux环境上安装并制作基础镜像，然后导入到Mac上运行)</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">yum -y install febootstrap </div><div class="line"><span class="comment">#centos6-image -i 参数制定需要安装的软件</span></div><div class="line">febootstrap -i bash -i wget -i yum -i iputils -i iproute -i man -i vim-minimal centos65 centos65-image http://mirrors.aliyun.com/centos/<span class="number">6.5</span>/os/x86_64/</div></pre></td></tr></table></figure>
