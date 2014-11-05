@@ -263,7 +263,7 @@
 
 <h3 id="Linux环境（CentOS）">Linux环境（CentOS）</h3>
 <p>1 配置epel yum，使用国内的repo访问速度比较快</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> /etc/yum.repos.d/</div><div class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-<span class="number">6</span>.repo </div><div class="line">rpm -ivh http://mirrors.aliyun.com/epel/<span class="number">6</span>Server/x86_64/epel-release-<span class="number">6</span>-<span class="number">8</span>.noarch.rpm</div></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> /etc/yum.repos.d/</div><div class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-<span class="number">6</span>.repo </div><div class="line"><span class="comment">#wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.163.com/.help/CentOS6-Base-163.repo</span></div><div class="line">rpm -ivh http://mirrors.aliyun.com/epel/<span class="number">6</span>Server/x86_64/epel-release-<span class="number">6</span>-<span class="number">8</span>.noarch.rpm</div></pre></td></tr></table></figure>
 
 
 <p>2 yum更新</p>
