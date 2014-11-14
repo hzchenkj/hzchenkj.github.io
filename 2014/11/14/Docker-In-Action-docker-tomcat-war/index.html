@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   
-  <title>Docker-In-Action-docker-tomcat-war | LinuxCoffee</title>
+  <title>Docker-In-Action-&lt;四&gt; 运行tomcat 加载war包 mysql 方式运行容器 | LinuxCoffee</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   
     <meta name="author" content="hzchenkj">
@@ -14,37 +14,29 @@
 war容器
 1234$cd docker$mkdir war$cd war $touch Dockerfile
 
-
-
-123456789">
+Dockerfile">
   
   <meta name="description" content="再整理一篇学习docker的笔记，使用ubuntu来作base image，然后用—volumes-from 将war包挂在到tomcat容器运行.需要两个容器：1 获取URL中指定的war文件并存储到volume2 一个运行tomcat服务并加载war包得容器
 war容器
 1234$cd docker$mkdir war$cd war $touch Dockerfile
 
-
-
-123456789">
+Dockerfile">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Docker-In-Action-docker-tomcat-war">
+<meta property="og:title" content="Docker-In-Action-<四> 运行tomcat 加载war包 mysql 方式运行容器">
 <meta property="og:url" content="http://hzchenkj.github.com/2014/11/14/Docker-In-Action-docker-tomcat-war/">
 <meta property="og:site_name" content="LinuxCoffee">
 <meta property="og:description" content="再整理一篇学习docker的笔记，使用ubuntu来作base image，然后用—volumes-from 将war包挂在到tomcat容器运行.需要两个容器：1 获取URL中指定的war文件并存储到volume2 一个运行tomcat服务并加载war包得容器
 war容器
 1234$cd docker$mkdir war$cd war $touch Dockerfile
 
-
-
-123456789">
+Dockerfile">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Docker-In-Action-docker-tomcat-war">
+<meta name="twitter:title" content="Docker-In-Action-<四> 运行tomcat 加载war包 mysql 方式运行容器">
 <meta name="twitter:description" content="再整理一篇学习docker的笔记，使用ubuntu来作base image，然后用—volumes-from 将war包挂在到tomcat容器运行.需要两个容器：1 获取URL中指定的war文件并存储到volume2 一个运行tomcat服务并加载war包得容器
 war容器
 1234$cd docker$mkdir war$cd war $touch Dockerfile
 
-
-
-123456789">
+Dockerfile">
 
   
   
@@ -88,7 +80,7 @@ war容器
     
     
   
-    <h1 class="title">Docker-In-Action-docker-tomcat-war</h1>
+    <h1 class="title">Docker-In-Action-&lt;四&gt; 运行tomcat 加载war包 mysql 方式运行容器</h1>
   
 
   </header>
@@ -99,20 +91,19 @@ war容器
 <h2 id="war容器">war容器</h2>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$cd</span> docker</div><div class="line"><span class="variable">$mkdir</span> war</div><div class="line"><span class="variable">$cd</span> war </div><div class="line"><span class="variable">$touch</span> Dockerfile</div></pre></td></tr></table></figure>
 
-
-
+<p>Dockerfile 文件 </p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">FROM ubuntu:<span class="number">14.04</span></div><div class="line">MAINTAINER hzchenkj &lt;hzchenkj@gmail.com&gt;</div><div class="line">ENV REFRESHED_AT <span class="number">2014</span>-<span class="number">11</span>-<span class="number">01</span></div><div class="line">RUN apt-get -yqq update</div><div class="line">RUN apt-get -yqq install wget</div><div class="line">VOLUME [ <span class="string">"/var/lib/tomcat7/webapps/"</span> ]</div><div class="line">WORKDIR /var/lib/tomcat7/webapps/</div><div class="line">ENTRYPOINT [ <span class="string">"wget"</span> ]</div><div class="line">CMD [ <span class="string">"-?"</span> ]</div></pre></td></tr></table></figure>
 
-<p>在ubuntu镜像基础上，安装wget软件，使用/var/lib/tomcat7/webapps/ 挂在volume并指定为工作目录，便于后面wget命令下载war包。<br>使用ENTRYPOINT和CMD命令组合方式，提供了默认不带参数运行docker run，会提示怎么使用wget命令，使用指定url参数运行wget下载。</p>
+<p>在ubuntu镜像基础上，安装wget软件，使用/var/lib/tomcat7/webapps/ 挂在volume并指定为工作目录，便于后面wget命令下载war包。<br>使用ENTRYPOINT和CMD命令组合方式，提供了默认不带参数运行docker run，会提示怎么使用wget命令，使用指定url参数运行wget下载。<br>构建镜像并运行：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">docker build -t hzchenkj/war .</div><div class="line">docker run -t -i --name sample hzchenkj/war https://tomcat.apache.org/tomcat-<span class="number">7.0</span>-doc/appdev/sample/sample.war</div></pre></td></tr></table></figure>
 
 
-<p>下载samplewar包，放到/var/lib/tomcat7/webapps/，在host主机路径/var/lib/docker/vfs/dir/：</p>
+<p>下载sample war包，放到/var/lib/tomcat7/webapps/，在host主机路径/var/lib/docker/vfs/dir/能查到对于的war包：</p>
 <h2 id="tomcat容器">tomcat容器</h2>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ mkdir tomcat7</div><div class="line">$ <span class="built_in">cd</span> tomcat7</div><div class="line">$ touch Dockerfile</div></pre></td></tr></table></figure>
 
 
-
+<p>Dockerfile文件：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">FROM ubuntu:<span class="number">14.04</span></div><div class="line">MAINTAINER hzchenkj &lt;hzchenkj@<span class="number">163</span>.com&gt;</div><div class="line">ENV REFRESHED_AT <span class="number">2014</span>-<span class="number">11</span>-<span class="number">01</span></div><div class="line">RUN apt-get -yqq update</div><div class="line">RUN apt-get -yqq install tomcat7 default-jdk</div><div class="line">ENV CATALINA_HOME /usr/share/tomcat7</div><div class="line">ENV CATALINA_BASE /var/lib/tomcat7</div><div class="line">ENV CATALINA_PID /var/run/tomcat7.pid</div><div class="line">ENV CATALINA_SH /usr/share/tomcat7/bin/catalina.sh </div><div class="line">ENV CATALINA_TMPDIR /tmp/tomcat7-tomcat7-tmp</div><div class="line">RUN mkdir -p <span class="variable">$CATALINA_TMPDIR</span></div><div class="line">VOLUME [ <span class="string">"/var/lib/tomcat7/webapps/"</span> ]</div><div class="line">EXPOSE <span class="number">8080</span></div><div class="line">ENTRYPOINT [ <span class="string">"/usr/share/tomcat7/bin/catalina.sh"</span>, <span class="string">"run"</span> ]</div></pre></td></tr></table></figure>
 
 
@@ -126,6 +117,26 @@ war容器
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">docker run --name sample_app --volumes-from sample  <span class="operator">-d</span> -P hzchenkj/tomcat7</div><div class="line">docker port sample_app <span class="number">8080</span></div><div class="line">curl http://localhost:&lt;port&gt;</div></pre></td></tr></table></figure>
 
 
+
+<p>还可以通过link方式将数据库容器关联，来持久化数据到数据库容器</p>
+<h2 id="mysql_容器和数据容器">mysql 容器和数据容器</h2>
+<p>启动一个Volume_Data容器，将主机的/opt/data映射到容器的/data目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -v /opt/data/:/data/ --name Volume_Data ubuntu:<span class="number">14.04</span></div></pre></td></tr></table></figure>
+
+
+<p>启动mysql容器，使用前面创建的数据容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run <span class="operator">-d</span> -P -h mysqlhost --volumes-from Volume_Data --name mysql hzchenkj/mysql</div></pre></td></tr></table></figure>
+
+
+<p>启动tomcat容器，关联mysql容器，程序需要修改mysql数据库连接</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run <span class="operator">-d</span> -h tomcat7host --name tomcat7  --link mysql:db hzchenkj/tomcat7</div></pre></td></tr></table></figure>
+
+
+<p>会在tomcat容器的hosts文件中增加 “172.14.<em>.</em> db” 和相应的环境变量，来关联mysql容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">docker run -rm --volumes-from Volume_Data -v $(<span class="built_in">pwd</span>):/backup busybox tar cvf /backup/backup.tar /data</div></pre></td></tr></table></figure>
+
+
+<p>备份mysql的数据容器</p>
 
     
   </div>
@@ -141,7 +152,7 @@ war容器
 
 <section id="comment">
   <h1 class="title">评论</h1>
-  <div class="ds-thread" data-title="Docker-In-Action-docker-tomcat-war">
+  <div class="ds-thread" data-title="Docker-In-Action-&lt;四&gt; 运行tomcat 加载war包 mysql 方式运行容器">
   </div>
 </section>
 </div>
