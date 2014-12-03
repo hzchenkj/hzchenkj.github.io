@@ -1,0 +1,141 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>Ansible学习笔记&lt;二&gt; -Playbooks篇 | LinuxCoffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="hzchenkj">
+  
+  
+    <meta name="description" content="12345 _     _                   ____       __  __           | |   (_)_ __  _   ___  __/ ___|___  / _|/ _| ___  ___ | |   | | &#39;_ \| | | \ \/ / |   / _ \| |_| |_ / _ \/ _ \| |___| | | | | |_| |&amp;gt;  &amp;lt">
+  
+  <meta name="description" content="12345 _     _                   ____       __  __           | |   (_)_ __  _   ___  __/ ___|___  / _|/ _| ___  ___ | |   | | '_ \| | | \ \/ / |   / _ \| |_| |_ / _ \/ _ \| |___| | | | | |_| |&gt;  &lt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible学习笔记<二> -Playbooks篇">
+<meta property="og:url" content="http://hzchenkj.github.com/2014/12/03/Ansible-Playbooks/">
+<meta property="og:site_name" content="LinuxCoffee">
+<meta property="og:description" content="12345 _     _                   ____       __  __           | |   (_)_ __  _   ___  __/ ___|___  / _|/ _| ___  ___ | |   | | '_ \| | | \ \/ / |   / _ \| |_| |_ / _ \/ _ \| |___| | | | | |_| |&gt;  &lt">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ansible学习笔记<二> -Playbooks篇">
+<meta name="twitter:description" content="12345 _     _                   ____       __  __           | |   (_)_ __  _   ___  __/ ___|___  / _|/ _| ___  ___ | |   | | '_ \| | | \ \/ / |   / _ \| |_| |_ / _ \/ _ \| |___| | | | | |_| |&gt;  &lt">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LinuxCoffee</a></h1>
+    <p><a href="/">东写西读</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+        <li><a href="/reading">Reading</a></li>
+      
+        <li><a href="/about">About</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content"><article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2014/12/03/Ansible-Playbooks/">
+  <time datetime="2014-12-03T08:20:12.000Z">
+    12月 3 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title">Ansible学习笔记&lt;二&gt; -Playbooks篇</h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> _     _                   ____       __  __           </div><div class="line">| |   (_)_ __  _   ___  __/ ___|___  / _|/ _| ___  ___ </div><div class="line">| |   | | <span class="string">'_ \| | | \ \/ / |   / _ \| |_| |_ / _ \/ _ \</span></div><div class="line">| |___| | | | | |_| |&gt;  &lt;| |__| (_) |  _|  _|  __/  __/</div><div class="line">|_____|_|_| |_|\__,_/_/\_\\____\___/|_| |_|  \___|\___|</div></pre></td></tr></table></figure>
+
+<p>Ansible，官方的解释是：Ansible is the simplest way to automate IT.<br>Ansible 是通过 Python 语言开发。当前使用 Ansible 的用户有：Evernote、EA、rackspace、NASA、Atlassian、Twitter 等。<br>Ansible 默认通过 SSH 协议管理机器。在被控机器上不需要安装任何组件，需要的Python一般的Linux服务器都已经自带了。是一种比Puppet、SaltStack等更加轻量级的自动化运维管理工具。自带的模块也极其丰富。<br>Ansible 使用一个高质量的 Python 实现的 OpenSSH 协议库 “paramiko”。 Paramiko 遵循 SSH2 协议，支持以加密和认证的方式，进行远程服务器的连接。对 paramiko 进行了更高层次的封装。<a href="http://www.paramiko.org/" target="_blank" rel="external">http://www.paramiko.org/</a><br>Ansible 使用  YAML 文件格式并使用 Jinja2 模板语言。</p>
+<p>一些相关链接：<br>官方网站：<a href="http://www.ansible.com/index.html" target="_blank" rel="external">http://www.ansible.com</a><br>官方文档：<a href="http://docs.ansible.com/index.html" target="_blank" rel="external">http://docs.ansible.com/index.html</a></p>
+<h2 id="四、Ansible’s_playbooks">四、Ansible’s playbooks</h2>
+<p>playbooks 翻译过来就是剧本，我们只要写好剧本，就会按照剧本进行演出。只要定义好远程服务器需要达到某种状态，Ansible就会去处理。</p>
+
+    
+  </div>
+  <footer>
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="Ansible学习笔记&lt;二&gt; -Playbooks篇">
+  </div>
+</section>
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2014 <a href="/">hzchenkj</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="http://ajax.useso.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'hzchenkj' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>
