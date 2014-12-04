@@ -62,6 +62,47 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2014/12/04/proxycommand/">
+  <time datetime="2014-12-04T10:38:49.000Z">
+    12月 4 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2014/12/04/proxycommand/">通过ProxyCommand 登录远程内网的服务器</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/config </div><div class="line"><span class="comment">#ControlMaster auto</span></div><div class="line"><span class="comment">#ControlPath /tmp/ssh_mux_%h_%p_%r</span></div><div class="line"><span class="comment">#ControlPersist 1h</span></div><div class="line"><span class="comment">#gateways</span></div><div class="line">Host  gateway</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        Hostname <span class="number">192.168</span>.<span class="number">16.230</span></div><div class="line"><span class="comment">#servers</span></div><div class="line">Host <span class="number">192.168</span>.<span class="number">22</span>.*</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        IdentityFile		   /path/to/ssh/key.pem</div><div class="line">        ProxyCommand ssh gateway nc %h %p</div></pre></td></tr></table></figure>
+
+
+<p>默认读取的时~/.ssh/config 这个文件，可以加上参数，指定不同的文件。<br>gateway 为堡垒机<br>然后192.168.22.* 类型的服务器ip都可以通过堡垒机登录。<br>先要先配置好ssh 互信，或指定key文件</p>
+<p>测试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ssh gateway -F ~/.ssh/config</div><div class="line">ssh <span class="number">192.168</span>.<span class="number">22.11</span> -F ~/.ssh/config.test </div><div class="line">ssh <span class="number">192.168</span>.<span class="number">22.11</span> -F ~/.ssh/config.test  -vvv 开启调试模式</div></pre></td></tr></table></figure>
+
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2014/12/03/Ansible-Playbooks/">
   <time datetime="2014-12-03T08:20:12.000Z">
     12月 3 2014

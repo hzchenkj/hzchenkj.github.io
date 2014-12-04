@@ -1,0 +1,147 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>通过ProxyCommand 登录远程内网的服务器 | LinuxCoffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="hzchenkj">
+  
+  
+    <meta name="description" content="有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：
+123456789101112131415cat ~/.ssh/co">
+  
+  <meta name="description" content="有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：
+123456789101112131415cat ~/.ssh/co">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过ProxyCommand 登录远程内网的服务器">
+<meta property="og:url" content="http://hzchenkj.github.com/2014/12/04/proxycommand/">
+<meta property="og:site_name" content="LinuxCoffee">
+<meta property="og:description" content="有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：
+123456789101112131415cat ~/.ssh/co">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过ProxyCommand 登录远程内网的服务器">
+<meta name="twitter:description" content="有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：
+123456789101112131415cat ~/.ssh/co">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LinuxCoffee</a></h1>
+    <p><a href="/">东写西读</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+        <li><a href="/reading">Reading</a></li>
+      
+        <li><a href="/about">About</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content"><article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2014/12/04/proxycommand/">
+  <time datetime="2014-12-04T10:38:49.000Z">
+    12月 4 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title">通过ProxyCommand 登录远程内网的服务器</h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/config </div><div class="line"><span class="comment">#ControlMaster auto</span></div><div class="line"><span class="comment">#ControlPath /tmp/ssh_mux_%h_%p_%r</span></div><div class="line"><span class="comment">#ControlPersist 1h</span></div><div class="line"><span class="comment">#gateways</span></div><div class="line">Host  gateway</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        Hostname <span class="number">192.168</span>.<span class="number">16.230</span></div><div class="line"><span class="comment">#servers</span></div><div class="line">Host <span class="number">192.168</span>.<span class="number">22</span>.*</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        IdentityFile		   /path/to/ssh/key.pem</div><div class="line">        ProxyCommand ssh gateway nc %h %p</div></pre></td></tr></table></figure>
+
+
+<p>默认读取的时~/.ssh/config 这个文件，可以加上参数，指定不同的文件。<br>gateway 为堡垒机<br>然后192.168.22.* 类型的服务器ip都可以通过堡垒机登录。<br>先要先配置好ssh 互信，或指定key文件</p>
+<p>测试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ssh gateway -F ~/.ssh/config</div><div class="line">ssh <span class="number">192.168</span>.<span class="number">22.11</span> -F ~/.ssh/config.test </div><div class="line">ssh <span class="number">192.168</span>.<span class="number">22.11</span> -F ~/.ssh/config.test  -vvv 开启调试模式</div></pre></td></tr></table></figure>
+
+
+    
+  </div>
+  <footer>
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="通过ProxyCommand 登录远程内网的服务器">
+  </div>
+</section>
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2014 <a href="/">hzchenkj</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="http://ajax.useso.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'hzchenkj' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>
