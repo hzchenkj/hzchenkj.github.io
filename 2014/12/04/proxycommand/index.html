@@ -75,7 +75,7 @@
   
   <div class="entry">
     
-      <p>有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：</p>
+      <p>有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。<br>像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。<br>现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/config </div><div class="line"><span class="comment">#ControlMaster auto</span></div><div class="line"><span class="comment">#ControlPath /tmp/ssh_mux_%h_%p_%r</span></div><div class="line"><span class="comment">#ControlPersist 1h</span></div><div class="line"><span class="comment">#gateways</span></div><div class="line">Host  gateway</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        Hostname <span class="number">192.168</span>.<span class="number">16.230</span></div><div class="line"><span class="comment">#servers</span></div><div class="line">Host <span class="number">192.168</span>.<span class="number">22</span>.*</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        IdentityFile		   /path/to/ssh/key.pem</div><div class="line">        ProxyCommand ssh gateway nc %h %p</div></pre></td></tr></table></figure>
 
 
@@ -105,7 +105,7 @@
   </div>
   <footer id="footer"><div class="copyright">
   
-  &copy; 2014 <a href="/">hzchenkj</a>
+  &copy; 2015 <a href="/">hzchenkj</a>
   
 </div>
 <div class="theme-copyright">

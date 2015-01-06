@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>Flask 开发环境设置 | LinuxCoffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="hzchenkj">
+  
+  
+    <meta name="description" content="Python web框架 Flask开发环境设置，引入venv虚拟环境，能很好的避免各程序版本冲突。
+123456cd ~mdkir weatherappcd weatherappmkdir templatestouch index.pytouch templates/index.html
+
+安装虚拟环境virtualenv,Mac OS X 下:
+1234567$sudo easy_instal">
+  
+  <meta name="description" content="Python web框架 Flask开发环境设置，引入venv虚拟环境，能很好的避免各程序版本冲突。
+123456cd ~mdkir weatherappcd weatherappmkdir templatestouch index.pytouch templates/index.html
+
+安装虚拟环境virtualenv,Mac OS X 下:
+1234567$sudo easy_instal">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flask 开发环境设置">
+<meta property="og:url" content="http://hzchenkj.github.com/2015/01/06/Flask-dev-setup/">
+<meta property="og:site_name" content="LinuxCoffee">
+<meta property="og:description" content="Python web框架 Flask开发环境设置，引入venv虚拟环境，能很好的避免各程序版本冲突。
+123456cd ~mdkir weatherappcd weatherappmkdir templatestouch index.pytouch templates/index.html
+
+安装虚拟环境virtualenv,Mac OS X 下:
+1234567$sudo easy_instal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flask 开发环境设置">
+<meta name="twitter:description" content="Python web框架 Flask开发环境设置，引入venv虚拟环境，能很好的避免各程序版本冲突。
+123456cd ~mdkir weatherappcd weatherappmkdir templatestouch index.pytouch templates/index.html
+
+安装虚拟环境virtualenv,Mac OS X 下:
+1234567$sudo easy_instal">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LinuxCoffee</a></h1>
+    <p><a href="/">东写西读</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+        <li><a href="/reading">Reading</a></li>
+      
+        <li><a href="/about">About</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content"><article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2015/01/06/Flask-dev-setup/">
+  <time datetime="2015-01-06T03:03:17.000Z">
+    1月 6 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title">Flask 开发环境设置</h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>Python web框架 Flask开发环境设置，引入venv虚拟环境，能很好的避免各程序版本冲突。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> ~</div><div class="line">mdkir weatherapp</div><div class="line"><span class="built_in">cd</span> weatherapp</div><div class="line">mkdir templates</div><div class="line">touch index.py</div><div class="line">touch templates/index.html</div></pre></td></tr></table></figure>
+
+<p>安装虚拟环境virtualenv,Mac OS X 下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$sudo</span> easy_install virtualenv</div><div class="line"><span class="variable">$cd</span> weatherapp</div><div class="line"><span class="variable">$virtualenv</span> venv</div><div class="line">New python executable <span class="keyword">in</span> venv/bin/python2.<span class="number">7</span></div><div class="line">lso creating executable <span class="keyword">in</span> venv/bin/python</div><div class="line">Installing setuptools............done.</div><div class="line">Installing pip...............done.</div></pre></td></tr></table></figure>
+
+<p>应用根目录会生成一个venv目录<br>激活venv</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$source</span> venv/bin/activate</div><div class="line">(venv)$</div></pre></td></tr></table></figure>
+
+<p>在venv下安装相关的软件包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">(venv)<span class="variable">$pip</span> install flask</div><div class="line">(venv)<span class="variable">$python</span></div><div class="line">&gt;&gt;&gt;import falsk</div><div class="line">&gt;&gt;&gt;</div></pre></td></tr></table></figure>
+
+<p>没有错误，就说明你的flask装好了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$vim</span> index.py</div><div class="line">from flask import Flask</div><div class="line">import os</div><div class="line">app = Flask(__name__)</div><div class="line">@app.route(<span class="string">"/"</span>)</div><div class="line">def index():</div><div class="line">    <span class="keyword">return</span> <span class="string">"Hello,World!"</span></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    port = int(os.environ.get(<span class="string">'PORT'</span>,<span class="number">5000</span>))</div><div class="line">    app.run(host=<span class="string">'0.0.0.0'</span>,port=port,debug=True)</div></pre></td></tr></table></figure>
+
+<p>运行flaskweb服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">(venv)<span class="variable">$python</span> index.py</div><div class="line"> * Running on http://<span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">5000</span>/</div><div class="line"> * Restarting with reloader</div></pre></td></tr></table></figure>
+
+<p> 浏览器输入<a href="http://localhost:5000" target="_blank" rel="external">http://localhost:5000</a> 就可以看到你的helloworld页面了。</p>
+
+    
+  </div>
+  <footer>
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="Flask 开发环境设置">
+  </div>
+</section>
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2015 <a href="/">hzchenkj</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="http://ajax.useso.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'hzchenkj' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>

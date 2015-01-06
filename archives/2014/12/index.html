@@ -62,6 +62,62 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2014/12/09/elk/">
+  <time datetime="2014-12-09T08:20:40.000Z">
+    12月 9 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2014/12/09/elk/">（elk）ElasticSearch-Logstash-Kibana</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>ElasticSearch 是构建在Apache Lucene之上的的搜索引擎服务，开源（Apache2协议），分布式，RESTful，实时 可扩展。安装方便，使用简单。<br>Logstash 收集工作日志数据，处理并分析，有告警功能，有很多插件inputs filters outputs<br>Kibana  支持可视化数据，过滤，查询等功能</p>
+<p>三者可以独立使用，也可以一起组合提供强大的功能。<br><img src="http://hzchenkj-github-io.qiniudn.com/elk.png" alt="elk"></p>
+<p>可以方便的扩展：<br><img src="http://hzchenkj-github-io.qiniudn.com/elk-cluster.png" alt="elk-cluster"></p>
+<h1 id="一、ElasticSearch">一、ElasticSearch</h1>
+<p>需要Java环境，现在设置好Java 环境变量。测试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$java</span> -version</div><div class="line">java version <span class="string">"1.6.0_25"</span></div><div class="line">Java(TM) SE Runtime Environment (build <span class="number">1.6</span>.<span class="number">0</span>_25-b06)</div><div class="line">Java HotSpot(TM) <span class="number">64</span>-Bit Server VM (build <span class="number">20.0</span>-b11, mixed mode)</div></pre></td></tr></table></figure>
+
+<p>下载elasticsearch 文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$wget</span>  https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-<span class="number">1.4</span>.<span class="number">1</span>.tar.gz</div><div class="line"><span class="variable">$tar</span> zxvf elasticsearch-<span class="number">1.4</span>.<span class="number">1</span>.tar.gz</div><div class="line"><span class="variable">$cd</span> elasticsearch-<span class="number">1.4</span>.<span class="number">1</span></div><div class="line">$ ls</div><div class="line">bin  config  data  lib  LICENSE.txt  logs  NOTICE.txt  plugins  README.textile</div></pre></td></tr></table></figure>
+
+<p>bin 启动脚本<br>config 配置文件<br>data 默认数据目录<br>plugins  插件目录</p>
+<p>可以零配置上使用<br>vi config/elasticsearch.yml </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#cluster.name: elasticsearch</span></div><div class="line"><span class="comment">#node.name: "Franz Kafka"</span></div><div class="line"><span class="comment">#path.data: /path/to/data</span></div></pre></td></tr></table></figure>
+
+<p>启动elasticsearch </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> elasticsearch-<span class="number">1.3</span>.<span class="number">2</span> && bin/elasticsearch <span class="operator">-d</span></div><div class="line">curl -X GET http://localhost:<span class="number">9200</span>/</div><div class="line">{</div><div class="line">  <span class="string">"status"</span> : <span class="number">200</span>,</div><div class="line">  <span class="string">"name"</span> : <span class="string">"Mister Fear"</span>,</div><div class="line">  <span class="string">"cluster_name"</span> : <span class="string">"elasticsearch"</span>,</div><div class="line">  <span class="string">"version"</span> : {</div><div class="line">    <span class="string">"number"</span> : <span class="string">"1.4.1"</span>,</div><div class="line">    <span class="string">"build_hash"</span> : <span class="string">"89d3241d670db65f994242c8e8383b169779e2d4"</span>,</div><div class="line">    <span class="string">"build_timestamp"</span> : <span class="string">"2014-11-26T15:49:29Z"</span>,</div><div class="line">    <span class="string">"build_snapshot"</span> : <span class="literal">false</span>,</div><div class="line">    <span class="string">"lucene_version"</span> : <span class="string">"4.10.2"</span></div><div class="line">  },</div><div class="line">  <span class="string">"tagline"</span> : <span class="string">"You Know, for Search"</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>安装web管理界面插件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ bin/plugin -i elasticsearch/marvel/latest</div></pre></td></tr></table></figure>
+
+<p>浏览器访问<br><a href="http://localhost:9200/_plugin/marvel/" target="_blank" rel="external">http://localhost:9200/_plugin/marvel/</a></p>
+<h1 id="二、Logstash">二、Logstash</h1>
+<h1 id="三、Kibana">三、Kibana</h1>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2014/12/04/proxycommand/">
   <time datetime="2014-12-04T10:38:49.000Z">
     12月 4 2014
@@ -77,7 +133,7 @@
   
   <div class="entry">
     
-      <p>有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：</p>
+      <p>有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。<br>像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。<br>现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/config </div><div class="line"><span class="comment">#ControlMaster auto</span></div><div class="line"><span class="comment">#ControlPath /tmp/ssh_mux_%h_%p_%r</span></div><div class="line"><span class="comment">#ControlPersist 1h</span></div><div class="line"><span class="comment">#gateways</span></div><div class="line">Host  gateway</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        Hostname <span class="number">192.168</span>.<span class="number">16.230</span></div><div class="line"><span class="comment">#servers</span></div><div class="line">Host <span class="number">192.168</span>.<span class="number">22</span>.*</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        IdentityFile		   /path/to/ssh/key.pem</div><div class="line">        ProxyCommand ssh gateway nc %h %p</div></pre></td></tr></table></figure>
 
 
@@ -288,7 +344,7 @@
   </div>
   <footer id="footer"><div class="copyright">
   
-  &copy; 2014 <a href="/">hzchenkj</a>
+  &copy; 2015 <a href="/">hzchenkj</a>
   
 </div>
 <div class="theme-copyright">
