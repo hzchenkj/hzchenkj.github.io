@@ -62,6 +62,131 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2015/01/20/Nginx-PHP/">
+  <time datetime="2015-01-20T01:02:54.000Z">
+    1月 20 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/01/20/Nginx-PHP/">Nginx PHP 整合</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>yum install tar unzip </p>
+<p>现在流行用LNMP的组合框架了。整理了一小篇。<br>常规的做法是将数据库和Web 应用分两台进行部署。网上的文章，基本上都是在一台Linux服务器上部署Nginx + PHP + MySQL。<br>在编译PHP的时候都需要安装MySQL 的软件，然后带上—with-mysql的参数。但我们在这台服务器上根本就用不上MySQL的服务。<br>后来在PHP官网找到一个文档说明，说PHP 默认已经在某个版本后，可以实现不用MySQL 既可以编译具有MySQL连接的PHP。</p>
+<p>本次使用的PHP版本是5.5.20 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">yum install -y php-mysql</div><div class="line">wget http://cn2.php.net/get/php-<span class="number">5.5</span>.<span class="number">20</span>.tar.gz/from/this/mirror</div><div class="line">tar zxvf php-<span class="number">5.5</span>.<span class="number">20</span>.tar.gz</div><div class="line"><span class="built_in">cd</span> php-<span class="number">5.5</span>.<span class="number">20</span></div><div class="line">./configure --prefix=/usr/local/php5  --enable-fpm --with-mysql</div><div class="line">make</div><div class="line">make install</div></pre></td></tr></table></figure>
+
+<p>还额外提供了很多的编译参数，当然还需要安装一些软件依赖包。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">--with-config-file-path=/usr/local/php5/etc \</div><div class="line">--enable-mbstring \</div><div class="line">--enable-ftp \</div><div class="line">--with-gd \</div><div class="line">--with-jpeg-dir=/usr \</div><div class="line">--with-png-dir=/usr \</div><div class="line">--enable-magic-quotes \ </div><div class="line">--with-mysql=/usr/local/server/mysql \</div><div class="line">--with-mysqli=/usr/local/server/mysql/bin/mysql_config \</div><div class="line">--without-pear \</div><div class="line">--with-pear \</div><div class="line">--enable-sockets \</div><div class="line">--with-ttf \</div><div class="line">--with-freetype-dir=/usr \</div><div class="line">--enable-gd-native-ttf \</div><div class="line">--with-zlib \</div><div class="line">--enable-sysvsem \</div><div class="line">--enable-exif \</div><div class="line">--enable-sysvshm \</div><div class="line">--with-libxml-dir=/usr \</div><div class="line">--with-iconv=/usr/local/libiconv \</div><div class="line">--with-iconv-dir=/usr/local \</div><div class="line">--with-xmlrpc \</div><div class="line">--enable-xml \</div><div class="line">--enable-shmop \</div><div class="line">--enable-zip \</div><div class="line">--with-mhash \</div><div class="line">--with-mcrypt \</div><div class="line">--enable-discard-path \</div><div class="line">--enable-bcmath \</div><div class="line">--enable-inline-optimization \</div><div class="line">--with-curl \</div><div class="line">--with-curlwrappers \</div><div class="line">--enable-mbregex \</div><div class="line">--with-openssl\</div><div class="line">--enable-fpm \</div><div class="line">--enable-opcache=no</div></pre></td></tr></table></figure>
+
+<p>软件包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">yum install -y  gcc gcc-c++ autoconf libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel </div><div class="line"> glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel </div><div class="line">curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel </div><div class="line">yum install -y zlib zlib-devel libxml2 libxml2-devel</div></pre></td></tr></table></figure>
+
+<p>拷贝php配置文件和php-fpm的配置。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cp /usr/local/src/php-<span class="number">5.5</span>.<span class="number">20</span>/php.ini-development /usr/local/php5/php.ini</div><div class="line">cp /usr/local/php5/etc/php-fpm.conf.default /usr/local/php5/etc/php-fpm.conf</div><div class="line">cp sapi/fpm/php-fpm /usr/local/bin</div></pre></td></tr></table></figure>
+
+<p>vim /usr/local/php5/php.ini</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cgi.fix_pathinfo=<span class="number">0</span></div></pre></td></tr></table></figure>
+
+<p>vim /usr/local/php5/etc/php-fpm.conf</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">user = www-data</div><div class="line">group = www-data</div><div class="line">pid = run/php-fpm.pid</div><div class="line">security.limit_extensions = .php .php3 .php4 .php5 .css .js .jpg .jpeg .gif .png .html .htm</div></pre></td></tr></table></figure>
+
+<p>然后启动 php-fpm 服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">/usr/local/bin/php-fpm</div><div class="line">netstat -ant|grep <span class="number">9000</span></div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#关闭php-fpm</span></div><div class="line">kill -INT `cat /usr/local/php5/var/run/php-fpm.pid`</div><div class="line"><span class="comment">#重启php-fpm</span></div><div class="line">kill -USR2 `cat /usr/local/php5/var/run/php-fpm.pid`</div></pre></td></tr></table></figure>
+
+<p>安装Nginx</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">groupadd -r -g <span class="number">5000</span> nginx</div><div class="line">useradd -r -g nginx -u <span class="number">5000</span> nginx</div><div class="line">yum -y install pcre pcre-devel</div><div class="line">wget http://nginx.org/download/nginx-<span class="number">1.2</span>.<span class="number">9</span>.tar.gz</div><div class="line">tar zxvf nginx-<span class="number">1.2</span>.<span class="number">9</span>.tar.gz</div><div class="line"><span class="built_in">cd</span> nginx-<span class="number">1.2</span>.<span class="number">9</span></div><div class="line">./configure --prefix=/usr/local/nginx</div></pre></td></tr></table></figure>
+
+<p>配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">location ~* \.php$ {</div><div class="line">    fastcgi_index   index.php;</div><div class="line">    fastcgi_pass    <span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">9000</span>;</div><div class="line">    include         fastcgi_params;</div><div class="line">    fastcgi_param   SCRIPT_FILENAME    <span class="variable">$document_root</span><span class="variable">$fastcgi_script_name</span>;</div><div class="line">    fastcgi_param   SCRIPT_NAME        <span class="variable">$fastcgi_script_name</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>其他的一个版本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">location ~* \.(php[<span class="number">3</span>-<span class="number">9</span>]?|phtm[l]?)(\/.*)*$ {  </div><div class="line">        fastcgi_index index.php;  </div><div class="line">        fastcgi_pass <span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">9000</span>;  </div><div class="line">        include fastcgi_params;  </div><div class="line">        <span class="keyword">set</span> <span class="variable">$path_info</span> <span class="string">""</span>;  </div><div class="line">        <span class="keyword">set</span> <span class="variable">$real_script_name</span> <span class="variable">$fastcgi_script_name</span>;  </div><div class="line">        <span class="keyword">if</span> (<span class="variable">$fastcgi_script_name</span> ~ <span class="string">"^(.+?\.php)(/.+)$"</span>) {  </div><div class="line">                <span class="keyword">set</span> <span class="variable">$real_script_name</span> <span class="variable">$1</span>;  </div><div class="line">                <span class="keyword">set</span> <span class="variable">$path_info</span> <span class="variable">$2</span>;  </div><div class="line">        }  </div><div class="line">        fastcgi_param SCRIPT_FILENAME <span class="variable">$document_root</span><span class="variable">$real_script_name</span>;  </div><div class="line">        fastcgi_param SCRIPT_NAME <span class="variable">$real_script_name</span>;  </div><div class="line">        fastcgi_param PATH_INFO <span class="variable">$path_info</span>;  </div><div class="line">}  </div><div class="line">location ~* \.(php[<span class="number">3</span>-<span class="number">9</span>]?|phtm[l]?)(\/.*)*$ {  </div><div class="line">    fastcgi_index index.php;</div><div class="line">    fastcgi_pass <span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">9000</span>;<span class="comment">#这里指定了fastcgi进程侦听的端口,nginx就是通过这里与php交互的</span></div><div class="line">    include fastcgi_params;</div><div class="line">    <span class="keyword">set</span> <span class="variable">$path_info</span> <span class="string">""</span>;</div><div class="line">    <span class="keyword">set</span> <span class="variable">$real_script_name</span> <span class="variable">$fastcgi_script_name</span>;</div><div class="line">    <span class="keyword">if</span> (<span class="variable">$fastcgi_script_name</span> ~ <span class="string">"^(.+?\.php)(/.+)$"</span>) {</div><div class="line">            <span class="keyword">set</span> <span class="variable">$real_script_name</span> <span class="variable">$1</span>;</div><div class="line">            <span class="keyword">set</span> <span class="variable">$path_info</span> <span class="variable">$2</span>;</div><div class="line">    }</div><div class="line">    fastcgi_param SCRIPT_FILENAME <span class="variable">$document_root</span><span class="variable">$real_script_name</span>;</div><div class="line">    fastcgi_param SCRIPT_NAME <span class="variable">$real_script_name</span>;</div><div class="line">    fastcgi_param PATH_INFO <span class="variable">$path_info</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>fastcgi_param 参数</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">fastcgi_cache_path /usr/local/nginx/fastcgi_cache levels=<span class="number">1</span>:<span class="number">2</span> keys_zone=TEST:<span class="number">10</span>m inactive=<span class="number">5</span>m;      </div><div class="line">fastcgi_connect_timeout <span class="number">300</span>;      </div><div class="line">fastcgi_send_timeout <span class="number">300</span>;      </div><div class="line">fastcgi_<span class="built_in">read</span>_timeout <span class="number">300</span>;      </div><div class="line">fastcgi_buffer_size <span class="number">64</span>k;      </div><div class="line">fastcgi_buffers <span class="number">4</span> <span class="number">64</span>k;      </div><div class="line">fastcgi_busy_buffers_size <span class="number">128</span>k;      </div><div class="line">fastcgi_temp_file_write_size <span class="number">128</span>k;      </div><div class="line">fastcgi_cache TEST;      </div><div class="line">fastcgi_cache_valid <span class="number">200</span> <span class="number">302</span> <span class="number">1</span>h;      </div><div class="line">fastcgi_cache_valid <span class="number">301</span> <span class="number">1</span>d;      </div><div class="line">fastcgi_cache_valid any <span class="number">1</span>m;</div></pre></td></tr></table></figure>
+
+<p> 下面是对上述代码的含义进行介绍。<br>第一行代码是为FastCGI缓存指定一个文件路径、目录结构等级、关键字区域存储时间和非活动删除时间。<br>fastcgi_connect_timeout：指定连接到后端FastCGI的超时时间。<br>fastcgi_send_timeout：指定向FastCGI传送请求的超时时间，这个值是已经完成两次握手后向FastCGI传送请求的超时时间。<br>fastcgi_read_timeout：指定接收FastCGI应答的超时时间，这个值是已经完成两次握手后接收FastCGI应答的超时时间。<br>fastcgi_buffer_size：用于指定读取FastCGI应答第一部分需要用多大的缓冲区，这个值表示将使用1个64KB的缓冲区读取应答的第一部分（应答头），可以设置为fastcgi_buffers选项指定的缓冲区大小。<br>fastcgi_buffers：指定本地需要用多少和多大的缓冲区来缓冲FastCGI的应答请求。如果一个PHP脚本所产生的页面大小为256KB，那么会为其分配4个64KB的缓冲区来缓存；如果页面大小大于256KB，那么大于256KB的部分会缓存到fastcgi_temp指定的路径中，但是这并不是好方法，因为内存中的数据处理速度要快于硬盘。一般这个值应该为站点中PHP脚本所产生的页面大小的中间值，如果站点大部分脚本所产生的页面大小为256KB，那么可以把这个值设置为“16 16k”、“4 64k”等。<br>fastcgi_busy_buffers_size：的默认值是fastcgi_buffers的两倍。<br>fastcgi_temp_file_write_size：表示在写入缓存文件时使用多大的数据块，默认值是fastcgi_buffers的两倍。<br>fastcgi_cache：表示开启FastCGI缓存并为其指定一个名称。开启缓存非常有用，可以有效降低CPU的负载，并且防止502错误的发生，但是开启缓存也会引起很多问题，要视具体情况而定。<br>fastcgi_cache_valid：fastcgi用来指定应答代码的缓存时间，实例中的值表示将200和302应答缓存一个小时，将301应答缓存1天，其他应答均缓存1分钟。</p>
+<p>rm /usr/local/nginx/html/index.html<br>echo “&lt;?php phpinfo(); ?&gt;” &gt;&gt; /usr/local/nginx/html/index.php</p>
+<p>下载最新版本的Discuz论坛</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">yum install unzip </div><div class="line">mkdir temp</div><div class="line"><span class="built_in">cd</span> temp </div><div class="line">wget  http://download.comsenz.com/DiscuzX/<span class="number">3.2</span>/Discuz_X3.<span class="number">2</span>_SC_UTF8.zip</div><div class="line">unzip Discuz_X3.<span class="number">2</span>_SC_UTF8.zip</div><div class="line">cp -r upload /data/bbs</div><div class="line">chmod -R <span class="number">777</span>  /data/bbs/config</div><div class="line">chmod -R <span class="number">777</span>  /data/bbs/data</div><div class="line">chmod -R <span class="number">777</span>  /data/bbs/uc_client</div><div class="line">chmod -R <span class="number">777</span>  /data/bbs/uc_server</div></pre></td></tr></table></figure>
+
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2015/01/09/Flask-extensions/">
+  <time datetime="2015-01-09T07:21:23.000Z">
+    1月 9 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/01/09/Flask-extensions/">Flask extensions 汇总</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>Flask 的扩张结构是在诞生的时候就确定了的。存在各种各样好用的扩张。<br>这里整理了一些常用的扩张：<br>1  Flask-script<br>给flask提供命令行选项，可以在shell里进行调试，测试工作。<br>pip install flask-scripts<br>from flask.ext.script import Manager<br>manager = Manager(app)<br>manager.run()</p>
+<p>python test.py —help<br>python test.py shell<br>python test.py runserver -h 0.0.0.0 -p 5000</p>
+<p>2 Flask-Bootstrap<br>pip install flask-bootstrap</p>
+<p>from flask.ext.bootstrap import Bootstrap</p>
+<p>bootstrap = Bootstrap(app)</p>
+<p>user.html</p>
+<p>3 Flask-Moment 时间日期本地格式化<br>pip install flask-moment</p>
+<p>from flask.ext.moment import Moment<br>moment = Moment(app)</p>
+<p>index.html</p>
+<p>4 Flask-WTF Form表单<br>pip  install falsk-wtf</p>
+<p>Form Classes 继承自Form<br>from flask.ext.wtf import Form<br>from wtforms import StringField,SubmitField<br>from wtform.validators import Rrquired</p>
+<p>class NameForm(Form):<br>    name = StringField(‘What is your name?’,validators=[Required()])<br>    submit = SubmitField(‘Submit’)</p>
+<p> StringField<br> TextAreaField<br> PasswordField<br> HiddenField<br> DateField<br> DateTimeField<br> IntegerField<br> DecimalField<br> FloatField<br> BooleanField<br> RadioField<br> SelectField<br> SelectMultipleField<br> FielField<br> SubmitField<br> FormField<br> FieldList</p>
+<p>5 数据库<br>pip install flask-sqlalchemy<br>MySQL mysql://username:password@hostname/database</p>
+<p>2 Login<br>3 Form</p>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2015/01/06/Flask-dev-setup/">
   <time datetime="2015-01-06T03:03:17.000Z">
     1月 6 2015
@@ -96,6 +221,18 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">(venv)<span class="variable">$python</span> index.py</div><div class="line"> * Running on http://<span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">5000</span>/</div><div class="line"> * Restarting with reloader</div></pre></td></tr></table></figure>
 
 <p> 浏览器输入<a href="http://localhost:5000" target="_blank" rel="external">http://localhost:5000</a> 就可以看到你的helloworld页面了。</p>
+<p>所有的Flask应用程序都需要创建一个app实例。服务响应客户端请求使用WSGI（Web Server Gateway Interace）。<br>路由和视图函数:<br>路由就是用来保持URL地址和函数的关系。可以使用装饰器@app.route 来暴露路由。URL 可以有静态和动态的方式声明。<br>/user/<name> ,/user/<int:id></int:id></name></p>
+<p>模板<br>from flask import render_template</p>
+<p>变量：<br> 变量<br>undefined 字典<br>undefined 列表<br>undefined 带变量的列表<br> 对象的方法<br> 管道： safe ,lower,upper,title,trim,striptags</p>
+<p>控制:<br>判断：</p>
+<pre><code><span class="variable">Hello</span>,<span class="variable">Stranger</span><span class="exclamation_mark">!</span>
+</code></pre><p> 循环</p>
+<p>‘’’bash<br> macro</p>
+<p>‘’’</p>
+<ul><br><br></ul>
+
+<p>支持在外部文件定义：<br>‘’’bash<br>{ macros.render_ct(comment) }<br>‘’’<br>支持将重复的内容抽象，然后include</p>
+<p>支持继承：</p>
 
     
   </div>

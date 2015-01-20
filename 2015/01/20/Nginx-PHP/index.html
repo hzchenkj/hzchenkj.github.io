@@ -4,21 +4,27 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   
-  <title>归档: 2015/1 | LinuxCoffee</title>
+  <title>Nginx PHP 整合 | LinuxCoffee</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   
     <meta name="author" content="hzchenkj">
   
   
-  <meta name="description" content="GNU/Linux | Java | Python | Docker | Shell">
-<meta property="og:type" content="website">
-<meta property="og:title" content="LinuxCoffee">
-<meta property="og:url" content="http://hzchenkj.github.com/archives/2015/01/">
+    <meta name="description" content="yum install tar unzip 
+现在流行用LNMP的组合框架了。整理了一小篇。常规的做法是将数据库和Web 应用分两台进行部署。网上的文章，基本上都是在一台Linux服务器上部署Nginx + PHP + MySQL。在编译PHP的时候都需要安装MySQL 的软件，然后带上—with-mysql的参数。但我们在这台服务器上根本就用不上MySQL的服务。后来在PHP官网找到一个文档说明">
+  
+  <meta name="description" content="yum install tar unzip 
+现在流行用LNMP的组合框架了。整理了一小篇。常规的做法是将数据库和Web 应用分两台进行部署。网上的文章，基本上都是在一台Linux服务器上部署Nginx + PHP + MySQL。在编译PHP的时候都需要安装MySQL 的软件，然后带上—with-mysql的参数。但我们在这台服务器上根本就用不上MySQL的服务。后来在PHP官网找到一个文档说明">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx PHP 整合">
+<meta property="og:url" content="http://hzchenkj.github.com/2015/01/20/Nginx-PHP/">
 <meta property="og:site_name" content="LinuxCoffee">
-<meta property="og:description" content="GNU/Linux | Java | Python | Docker | Shell">
+<meta property="og:description" content="yum install tar unzip 
+现在流行用LNMP的组合框架了。整理了一小篇。常规的做法是将数据库和Web 应用分两台进行部署。网上的文章，基本上都是在一台Linux服务器上部署Nginx + PHP + MySQL。在编译PHP的时候都需要安装MySQL 的软件，然后带上—with-mysql的参数。但我们在这台服务器上根本就用不上MySQL的服务。后来在PHP官网找到一个文档说明">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LinuxCoffee">
-<meta name="twitter:description" content="GNU/Linux | Java | Python | Docker | Shell">
+<meta name="twitter:title" content="Nginx PHP 整合">
+<meta name="twitter:description" content="yum install tar unzip 
+现在流行用LNMP的组合框架了。整理了一小篇。常规的做法是将数据库和Web 应用分两台进行部署。网上的文章，基本上都是在一台Linux服务器上部署Nginx + PHP + MySQL。在编译PHP的时候都需要安装MySQL 的软件，然后带上—with-mysql的参数。但我们在这台服务器上根本就用不上MySQL的服务。后来在PHP官网找到一个文档说明">
 
   
   
@@ -50,15 +56,7 @@
   </nav>
   <div class="clearfix"></div>
 </header>
-    <div class="content">
-
-
-<h2 class="archives-title"><span>2015</span></h2>
-
-
-
-  
-    <article class="post">
+    <div class="content"><article class="post">
   <header>
     
       <div class="icon"></div>
@@ -70,7 +68,7 @@
     
     
   
-    <h1 class="title"><a href="/2015/01/20/Nginx-PHP/">Nginx PHP 整合</a></h1>
+    <h1 class="title">Nginx PHP 整合</h1>
   
 
   </header>
@@ -124,7 +122,7 @@
 
     
   </div>
-  <footer class="end-sep">
+  <footer>
     
       
       
@@ -134,126 +132,11 @@
 </article>
 
 
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2015/01/09/Flask-extensions/">
-  <time datetime="2015-01-09T07:21:23.000Z">
-    1月 9 2015
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2015/01/09/Flask-extensions/">Flask extensions 汇总</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <p>Flask 的扩张结构是在诞生的时候就确定了的。存在各种各样好用的扩张。<br>这里整理了一些常用的扩张：<br>1  Flask-script<br>给flask提供命令行选项，可以在shell里进行调试，测试工作。<br>pip install flask-scripts<br>from flask.ext.script import Manager<br>manager = Manager(app)<br>manager.run()</p>
-<p>python test.py —help<br>python test.py shell<br>python test.py runserver -h 0.0.0.0 -p 5000</p>
-<p>2 Flask-Bootstrap<br>pip install flask-bootstrap</p>
-<p>from flask.ext.bootstrap import Bootstrap</p>
-<p>bootstrap = Bootstrap(app)</p>
-<p>user.html</p>
-<p>3 Flask-Moment 时间日期本地格式化<br>pip install flask-moment</p>
-<p>from flask.ext.moment import Moment<br>moment = Moment(app)</p>
-<p>index.html</p>
-<p>4 Flask-WTF Form表单<br>pip  install falsk-wtf</p>
-<p>Form Classes 继承自Form<br>from flask.ext.wtf import Form<br>from wtforms import StringField,SubmitField<br>from wtform.validators import Rrquired</p>
-<p>class NameForm(Form):<br>    name = StringField(‘What is your name?’,validators=[Required()])<br>    submit = SubmitField(‘Submit’)</p>
-<p> StringField<br> TextAreaField<br> PasswordField<br> HiddenField<br> DateField<br> DateTimeField<br> IntegerField<br> DecimalField<br> FloatField<br> BooleanField<br> RadioField<br> SelectField<br> SelectMultipleField<br> FielField<br> SubmitField<br> FormField<br> FieldList</p>
-<p>5 数据库<br>pip install flask-sqlalchemy<br>MySQL mysql://username:password@hostname/database</p>
-<p>2 Login<br>3 Form</p>
-
-    
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="Nginx PHP 整合">
   </div>
-  <footer class="end-sep">
-    
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2015/01/06/Flask-dev-setup/">
-  <time datetime="2015-01-06T03:03:17.000Z">
-    1月 6 2015
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2015/01/06/Flask-dev-setup/">Flask 开发环境设置</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <p>Python web框架 Flask开发环境设置，引入venv虚拟环境，能很好的避免各程序版本冲突。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> ~</div><div class="line">mdkir weatherapp</div><div class="line"><span class="built_in">cd</span> weatherapp</div><div class="line">mkdir templates</div><div class="line">touch index.py</div><div class="line">touch templates/index.html</div></pre></td></tr></table></figure>
-
-<p>安装虚拟环境virtualenv,Mac OS X 下:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$sudo</span> easy_install virtualenv</div><div class="line"><span class="variable">$cd</span> weatherapp</div><div class="line"><span class="variable">$virtualenv</span> venv</div><div class="line">New python executable <span class="keyword">in</span> venv/bin/python2.<span class="number">7</span></div><div class="line">lso creating executable <span class="keyword">in</span> venv/bin/python</div><div class="line">Installing setuptools............done.</div><div class="line">Installing pip...............done.</div></pre></td></tr></table></figure>
-
-<p>应用根目录会生成一个venv目录<br>激活venv</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$source</span> venv/bin/activate</div><div class="line">(venv)$</div></pre></td></tr></table></figure>
-
-<p>在venv下安装相关的软件包</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">(venv)<span class="variable">$pip</span> install flask</div><div class="line">(venv)<span class="variable">$python</span></div><div class="line">&gt;&gt;&gt;import falsk</div><div class="line">&gt;&gt;&gt;</div></pre></td></tr></table></figure>
-
-<p>没有错误，就说明你的flask装好了</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$vim</span> index.py</div><div class="line">from flask import Flask</div><div class="line">import os</div><div class="line">app = Flask(__name__)</div><div class="line">@app.route(<span class="string">"/"</span>)</div><div class="line">def index():</div><div class="line">    <span class="keyword">return</span> <span class="string">"Hello,World!"</span></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    port = int(os.environ.get(<span class="string">'PORT'</span>,<span class="number">5000</span>))</div><div class="line">    app.run(host=<span class="string">'0.0.0.0'</span>,port=port,debug=True)</div></pre></td></tr></table></figure>
-
-<p>运行flaskweb服务</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">(venv)<span class="variable">$python</span> index.py</div><div class="line"> * Running on http://<span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">5000</span>/</div><div class="line"> * Restarting with reloader</div></pre></td></tr></table></figure>
-
-<p> 浏览器输入<a href="http://localhost:5000" target="_blank" rel="external">http://localhost:5000</a> 就可以看到你的helloworld页面了。</p>
-<p>所有的Flask应用程序都需要创建一个app实例。服务响应客户端请求使用WSGI（Web Server Gateway Interace）。<br>路由和视图函数:<br>路由就是用来保持URL地址和函数的关系。可以使用装饰器@app.route 来暴露路由。URL 可以有静态和动态的方式声明。<br>/user/<name> ,/user/<int:id></int:id></name></p>
-<p>模板<br>from flask import render_template</p>
-<p>变量：<br> 变量<br>undefined 字典<br>undefined 列表<br>undefined 带变量的列表<br> 对象的方法<br> 管道： safe ,lower,upper,title,trim,striptags</p>
-<p>控制:<br>判断：</p>
-<pre><code><span class="variable">Hello</span>,<span class="variable">Stranger</span><span class="exclamation_mark">!</span>
-</code></pre><p> 循环</p>
-<p>‘’’bash<br> macro</p>
-<p>‘’’</p>
-<ul><br><br></ul>
-
-<p>支持在外部文件定义：<br>‘’’bash<br>{ macros.render_ct(comment) }<br>‘’’<br>支持将重复的内容抽象，然后include</p>
-<p>支持继承：</p>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-
-  <nav id="pagination">
-  
-  
-  <div class="clearfix"></div>
-</nav>
-
+</section>
 </div>
   </div>
   <footer id="footer"><div class="copyright">

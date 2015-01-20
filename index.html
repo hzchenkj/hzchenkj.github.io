@@ -60,6 +60,131 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2015/01/20/Nginx-PHP/">
+  <time datetime="2015-01-20T01:02:54.000Z">
+    1月 20 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/01/20/Nginx-PHP/">Nginx PHP 整合</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>yum install tar unzip </p>
+<p>现在流行用LNMP的组合框架了。整理了一小篇。<br>常规的做法是将数据库和Web 应用分两台进行部署。网上的文章，基本上都是在一台Linux服务器上部署Nginx + PHP + MySQL。<br>在编译PHP的时候都需要安装MySQL 的软件，然后带上—with-mysql的参数。但我们在这台服务器上根本就用不上MySQL的服务。<br>后来在PHP官网找到一个文档说明，说PHP 默认已经在某个版本后，可以实现不用MySQL 既可以编译具有MySQL连接的PHP。</p>
+<p>本次使用的PHP版本是5.5.20 </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">yum install -y php-mysql</div><div class="line">wget http://cn2.php.net/get/php-<span class="number">5.5</span>.<span class="number">20</span>.tar.gz/from/this/mirror</div><div class="line">tar zxvf php-<span class="number">5.5</span>.<span class="number">20</span>.tar.gz</div><div class="line"><span class="built_in">cd</span> php-<span class="number">5.5</span>.<span class="number">20</span></div><div class="line">./configure --prefix=/usr/local/php5  --enable-fpm --with-mysql</div><div class="line">make</div><div class="line">make install</div></pre></td></tr></table></figure>
+
+<p>还额外提供了很多的编译参数，当然还需要安装一些软件依赖包。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">--with-config-file-path=/usr/local/php5/etc \</div><div class="line">--enable-mbstring \</div><div class="line">--enable-ftp \</div><div class="line">--with-gd \</div><div class="line">--with-jpeg-dir=/usr \</div><div class="line">--with-png-dir=/usr \</div><div class="line">--enable-magic-quotes \ </div><div class="line">--with-mysql=/usr/local/server/mysql \</div><div class="line">--with-mysqli=/usr/local/server/mysql/bin/mysql_config \</div><div class="line">--without-pear \</div><div class="line">--with-pear \</div><div class="line">--enable-sockets \</div><div class="line">--with-ttf \</div><div class="line">--with-freetype-dir=/usr \</div><div class="line">--enable-gd-native-ttf \</div><div class="line">--with-zlib \</div><div class="line">--enable-sysvsem \</div><div class="line">--enable-exif \</div><div class="line">--enable-sysvshm \</div><div class="line">--with-libxml-dir=/usr \</div><div class="line">--with-iconv=/usr/local/libiconv \</div><div class="line">--with-iconv-dir=/usr/local \</div><div class="line">--with-xmlrpc \</div><div class="line">--enable-xml \</div><div class="line">--enable-shmop \</div><div class="line">--enable-zip \</div><div class="line">--with-mhash \</div><div class="line">--with-mcrypt \</div><div class="line">--enable-discard-path \</div><div class="line">--enable-bcmath \</div><div class="line">--enable-inline-optimization \</div><div class="line">--with-curl \</div><div class="line">--with-curlwrappers \</div><div class="line">--enable-mbregex \</div><div class="line">--with-openssl\</div><div class="line">--enable-fpm \</div><div class="line">--enable-opcache=no</div></pre></td></tr></table></figure>
+
+<p>软件包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">yum install -y  gcc gcc-c++ autoconf libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel </div><div class="line"> glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel </div><div class="line">curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel </div><div class="line">yum install -y zlib zlib-devel libxml2 libxml2-devel</div></pre></td></tr></table></figure>
+
+<p>拷贝php配置文件和php-fpm的配置。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cp /usr/local/src/php-<span class="number">5.5</span>.<span class="number">20</span>/php.ini-development /usr/local/php5/php.ini</div><div class="line">cp /usr/local/php5/etc/php-fpm.conf.default /usr/local/php5/etc/php-fpm.conf</div><div class="line">cp sapi/fpm/php-fpm /usr/local/bin</div></pre></td></tr></table></figure>
+
+<p>vim /usr/local/php5/php.ini</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cgi.fix_pathinfo=<span class="number">0</span></div></pre></td></tr></table></figure>
+
+<p>vim /usr/local/php5/etc/php-fpm.conf</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">user = www-data</div><div class="line">group = www-data</div><div class="line">pid = run/php-fpm.pid</div><div class="line">security.limit_extensions = .php .php3 .php4 .php5 .css .js .jpg .jpeg .gif .png .html .htm</div></pre></td></tr></table></figure>
+
+<p>然后启动 php-fpm 服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">/usr/local/bin/php-fpm</div><div class="line">netstat -ant|grep <span class="number">9000</span></div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#关闭php-fpm</span></div><div class="line">kill -INT `cat /usr/local/php5/var/run/php-fpm.pid`</div><div class="line"><span class="comment">#重启php-fpm</span></div><div class="line">kill -USR2 `cat /usr/local/php5/var/run/php-fpm.pid`</div></pre></td></tr></table></figure>
+
+<p>安装Nginx</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">groupadd -r -g <span class="number">5000</span> nginx</div><div class="line">useradd -r -g nginx -u <span class="number">5000</span> nginx</div><div class="line">yum -y install pcre pcre-devel</div><div class="line">wget http://nginx.org/download/nginx-<span class="number">1.2</span>.<span class="number">9</span>.tar.gz</div><div class="line">tar zxvf nginx-<span class="number">1.2</span>.<span class="number">9</span>.tar.gz</div><div class="line"><span class="built_in">cd</span> nginx-<span class="number">1.2</span>.<span class="number">9</span></div><div class="line">./configure --prefix=/usr/local/nginx</div></pre></td></tr></table></figure>
+
+<p>配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">location ~* \.php$ {</div><div class="line">    fastcgi_index   index.php;</div><div class="line">    fastcgi_pass    <span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">9000</span>;</div><div class="line">    include         fastcgi_params;</div><div class="line">    fastcgi_param   SCRIPT_FILENAME    <span class="variable">$document_root</span><span class="variable">$fastcgi_script_name</span>;</div><div class="line">    fastcgi_param   SCRIPT_NAME        <span class="variable">$fastcgi_script_name</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>其他的一个版本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">location ~* \.(php[<span class="number">3</span>-<span class="number">9</span>]?|phtm[l]?)(\/.*)*$ {  </div><div class="line">        fastcgi_index index.php;  </div><div class="line">        fastcgi_pass <span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">9000</span>;  </div><div class="line">        include fastcgi_params;  </div><div class="line">        <span class="keyword">set</span> <span class="variable">$path_info</span> <span class="string">""</span>;  </div><div class="line">        <span class="keyword">set</span> <span class="variable">$real_script_name</span> <span class="variable">$fastcgi_script_name</span>;  </div><div class="line">        <span class="keyword">if</span> (<span class="variable">$fastcgi_script_name</span> ~ <span class="string">"^(.+?\.php)(/.+)$"</span>) {  </div><div class="line">                <span class="keyword">set</span> <span class="variable">$real_script_name</span> <span class="variable">$1</span>;  </div><div class="line">                <span class="keyword">set</span> <span class="variable">$path_info</span> <span class="variable">$2</span>;  </div><div class="line">        }  </div><div class="line">        fastcgi_param SCRIPT_FILENAME <span class="variable">$document_root</span><span class="variable">$real_script_name</span>;  </div><div class="line">        fastcgi_param SCRIPT_NAME <span class="variable">$real_script_name</span>;  </div><div class="line">        fastcgi_param PATH_INFO <span class="variable">$path_info</span>;  </div><div class="line">}  </div><div class="line">location ~* \.(php[<span class="number">3</span>-<span class="number">9</span>]?|phtm[l]?)(\/.*)*$ {  </div><div class="line">    fastcgi_index index.php;</div><div class="line">    fastcgi_pass <span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">9000</span>;<span class="comment">#这里指定了fastcgi进程侦听的端口,nginx就是通过这里与php交互的</span></div><div class="line">    include fastcgi_params;</div><div class="line">    <span class="keyword">set</span> <span class="variable">$path_info</span> <span class="string">""</span>;</div><div class="line">    <span class="keyword">set</span> <span class="variable">$real_script_name</span> <span class="variable">$fastcgi_script_name</span>;</div><div class="line">    <span class="keyword">if</span> (<span class="variable">$fastcgi_script_name</span> ~ <span class="string">"^(.+?\.php)(/.+)$"</span>) {</div><div class="line">            <span class="keyword">set</span> <span class="variable">$real_script_name</span> <span class="variable">$1</span>;</div><div class="line">            <span class="keyword">set</span> <span class="variable">$path_info</span> <span class="variable">$2</span>;</div><div class="line">    }</div><div class="line">    fastcgi_param SCRIPT_FILENAME <span class="variable">$document_root</span><span class="variable">$real_script_name</span>;</div><div class="line">    fastcgi_param SCRIPT_NAME <span class="variable">$real_script_name</span>;</div><div class="line">    fastcgi_param PATH_INFO <span class="variable">$path_info</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>fastcgi_param 参数</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">fastcgi_cache_path /usr/local/nginx/fastcgi_cache levels=<span class="number">1</span>:<span class="number">2</span> keys_zone=TEST:<span class="number">10</span>m inactive=<span class="number">5</span>m;      </div><div class="line">fastcgi_connect_timeout <span class="number">300</span>;      </div><div class="line">fastcgi_send_timeout <span class="number">300</span>;      </div><div class="line">fastcgi_<span class="built_in">read</span>_timeout <span class="number">300</span>;      </div><div class="line">fastcgi_buffer_size <span class="number">64</span>k;      </div><div class="line">fastcgi_buffers <span class="number">4</span> <span class="number">64</span>k;      </div><div class="line">fastcgi_busy_buffers_size <span class="number">128</span>k;      </div><div class="line">fastcgi_temp_file_write_size <span class="number">128</span>k;      </div><div class="line">fastcgi_cache TEST;      </div><div class="line">fastcgi_cache_valid <span class="number">200</span> <span class="number">302</span> <span class="number">1</span>h;      </div><div class="line">fastcgi_cache_valid <span class="number">301</span> <span class="number">1</span>d;      </div><div class="line">fastcgi_cache_valid any <span class="number">1</span>m;</div></pre></td></tr></table></figure>
+
+<p> 下面是对上述代码的含义进行介绍。<br>第一行代码是为FastCGI缓存指定一个文件路径、目录结构等级、关键字区域存储时间和非活动删除时间。<br>fastcgi_connect_timeout：指定连接到后端FastCGI的超时时间。<br>fastcgi_send_timeout：指定向FastCGI传送请求的超时时间，这个值是已经完成两次握手后向FastCGI传送请求的超时时间。<br>fastcgi_read_timeout：指定接收FastCGI应答的超时时间，这个值是已经完成两次握手后接收FastCGI应答的超时时间。<br>fastcgi_buffer_size：用于指定读取FastCGI应答第一部分需要用多大的缓冲区，这个值表示将使用1个64KB的缓冲区读取应答的第一部分（应答头），可以设置为fastcgi_buffers选项指定的缓冲区大小。<br>fastcgi_buffers：指定本地需要用多少和多大的缓冲区来缓冲FastCGI的应答请求。如果一个PHP脚本所产生的页面大小为256KB，那么会为其分配4个64KB的缓冲区来缓存；如果页面大小大于256KB，那么大于256KB的部分会缓存到fastcgi_temp指定的路径中，但是这并不是好方法，因为内存中的数据处理速度要快于硬盘。一般这个值应该为站点中PHP脚本所产生的页面大小的中间值，如果站点大部分脚本所产生的页面大小为256KB，那么可以把这个值设置为“16 16k”、“4 64k”等。<br>fastcgi_busy_buffers_size：的默认值是fastcgi_buffers的两倍。<br>fastcgi_temp_file_write_size：表示在写入缓存文件时使用多大的数据块，默认值是fastcgi_buffers的两倍。<br>fastcgi_cache：表示开启FastCGI缓存并为其指定一个名称。开启缓存非常有用，可以有效降低CPU的负载，并且防止502错误的发生，但是开启缓存也会引起很多问题，要视具体情况而定。<br>fastcgi_cache_valid：fastcgi用来指定应答代码的缓存时间，实例中的值表示将200和302应答缓存一个小时，将301应答缓存1天，其他应答均缓存1分钟。</p>
+<p>rm /usr/local/nginx/html/index.html<br>echo “&lt;?php phpinfo(); ?&gt;” &gt;&gt; /usr/local/nginx/html/index.php</p>
+<p>下载最新版本的Discuz论坛</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">yum install unzip </div><div class="line">mkdir temp</div><div class="line"><span class="built_in">cd</span> temp </div><div class="line">wget  http://download.comsenz.com/DiscuzX/<span class="number">3.2</span>/Discuz_X3.<span class="number">2</span>_SC_UTF8.zip</div><div class="line">unzip Discuz_X3.<span class="number">2</span>_SC_UTF8.zip</div><div class="line">cp -r upload /data/bbs</div><div class="line">chmod -R <span class="number">777</span>  /data/bbs/config</div><div class="line">chmod -R <span class="number">777</span>  /data/bbs/data</div><div class="line">chmod -R <span class="number">777</span>  /data/bbs/uc_client</div><div class="line">chmod -R <span class="number">777</span>  /data/bbs/uc_server</div></pre></td></tr></table></figure>
+
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2015/01/09/Flask-extensions/">
+  <time datetime="2015-01-09T07:21:23.000Z">
+    1月 9 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/01/09/Flask-extensions/">Flask extensions 汇总</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>Flask 的扩张结构是在诞生的时候就确定了的。存在各种各样好用的扩张。<br>这里整理了一些常用的扩张：<br>1  Flask-script<br>给flask提供命令行选项，可以在shell里进行调试，测试工作。<br>pip install flask-scripts<br>from flask.ext.script import Manager<br>manager = Manager(app)<br>manager.run()</p>
+<p>python test.py —help<br>python test.py shell<br>python test.py runserver -h 0.0.0.0 -p 5000</p>
+<p>2 Flask-Bootstrap<br>pip install flask-bootstrap</p>
+<p>from flask.ext.bootstrap import Bootstrap</p>
+<p>bootstrap = Bootstrap(app)</p>
+<p>user.html</p>
+<p>3 Flask-Moment 时间日期本地格式化<br>pip install flask-moment</p>
+<p>from flask.ext.moment import Moment<br>moment = Moment(app)</p>
+<p>index.html</p>
+<p>4 Flask-WTF Form表单<br>pip  install falsk-wtf</p>
+<p>Form Classes 继承自Form<br>from flask.ext.wtf import Form<br>from wtforms import StringField,SubmitField<br>from wtform.validators import Rrquired</p>
+<p>class NameForm(Form):<br>    name = StringField(‘What is your name?’,validators=[Required()])<br>    submit = SubmitField(‘Submit’)</p>
+<p> StringField<br> TextAreaField<br> PasswordField<br> HiddenField<br> DateField<br> DateTimeField<br> IntegerField<br> DecimalField<br> FloatField<br> BooleanField<br> RadioField<br> SelectField<br> SelectMultipleField<br> FielField<br> SubmitField<br> FormField<br> FieldList</p>
+<p>5 数据库<br>pip install flask-sqlalchemy<br>MySQL mysql://username:password@hostname/database</p>
+<p>2 Login<br>3 Form</p>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2015/01/06/Flask-dev-setup/">
   <time datetime="2015-01-06T03:03:17.000Z">
     1月 6 2015
@@ -94,6 +219,18 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">(venv)<span class="variable">$python</span> index.py</div><div class="line"> * Running on http://<span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">5000</span>/</div><div class="line"> * Restarting with reloader</div></pre></td></tr></table></figure>
 
 <p> 浏览器输入<a href="http://localhost:5000" target="_blank" rel="external">http://localhost:5000</a> 就可以看到你的helloworld页面了。</p>
+<p>所有的Flask应用程序都需要创建一个app实例。服务响应客户端请求使用WSGI（Web Server Gateway Interace）。<br>路由和视图函数:<br>路由就是用来保持URL地址和函数的关系。可以使用装饰器@app.route 来暴露路由。URL 可以有静态和动态的方式声明。<br>/user/<name> ,/user/<int:id></int:id></name></p>
+<p>模板<br>from flask import render_template</p>
+<p>变量：<br> 变量<br>undefined 字典<br>undefined 列表<br>undefined 带变量的列表<br> 对象的方法<br> 管道： safe ,lower,upper,title,trim,striptags</p>
+<p>控制:<br>判断：</p>
+<pre><code><span class="variable">Hello</span>,<span class="variable">Stranger</span><span class="exclamation_mark">!</span>
+</code></pre><p> 循环</p>
+<p>‘’’bash<br> macro</p>
+<p>‘’’</p>
+<ul><br><br></ul>
+
+<p>支持在外部文件定义：<br>‘’’bash<br>{ macros.render_ct(comment) }<br>‘’’<br>支持将重复的内容抽象，然后include</p>
+<p>支持继承：</p>
 
     
   </div>
@@ -656,198 +793,11 @@
 
 
   
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2014/10/27/Docker-In-Action-docker-ssh/">
-  <time datetime="2014-10-27T14:02:50.000Z">
-    10月 27 2014
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2014/10/27/Docker-In-Action-docker-ssh/">Docker In Action&lt;一&gt; 制作可以SSH登录的docker容器服务指北</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <p><img src="http://hzchenkj-github-io.qiniudn.com/docker-logo.png" alt="docker-logo"><br><a href="http://www.docker.com" target="_blank" rel="external">Docker</a>官网 的示例中基本上采用的是Ubuntu来作为环境的，但大部分企业相比来说还是采用RedHat/CentOS 系列的比较多，故这里整理了一篇从yum源方式制作自己干净简单的Docker镜像开始，一步一步构建具有SSH功能，Java/Tomcat环境，用Supervisor来启动并监控服务，最后构建具有Oracle等企业应用服务的完整Docker镜像。</p>
-<h2 id="环境准备">环境准备</h2>
-<h3 id="Mac环境">Mac环境</h3>
-<p>我的电脑是Mac OS X，故使用brew来安装 <a href="http://boot2docker.io/" target="_blank" rel="external">Boot2docker</a> 来运行docker，安装过程中会从亚马逊下载Boot2docker ISO镜像，需要用VPN翻墙。另前期需要安装好<a href="https://www.virtualbox.org/" target="_blank" rel="external">VirtuBox</a>这个虚拟机软件。</p>
-<p>启动boot2docker</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">MacBookPro:~ hzchenkj<span class="variable">$boot2docker</span> start <span class="comment">#启动boot2dokcer,并根据提示设置环境变量</span></div><div class="line">Waiting <span class="keyword">for</span> VM and Docker daemon to start...</div><div class="line">......</div><div class="line">MacBookPro:~ hzchenkj<span class="variable">$export</span> DOCKER_HOST=tcp://<span class="number">192.168</span>.<span class="number">59.103</span>:<span class="number">2376</span></div></pre></td></tr></table></figure>
-
-
-
-<p>然后查看下docker的版本：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">MacBookPro:hzchenkj$ docker  version</div><div class="line">Client version: <span class="number">1.3</span>.<span class="number">0</span></div><div class="line">Client API version: <span class="number">1.15</span></div><div class="line">Go version (client): go1.<span class="number">3.3</span></div><div class="line">Git commit (client): c78088f</div><div class="line">OS/Arch (client): darwin/amd64</div><div class="line">Server version: <span class="number">1.3</span>.<span class="number">0</span></div><div class="line">Server API version: <span class="number">1.15</span></div><div class="line">Go version (server): go1.<span class="number">3.3</span></div><div class="line">Git commit (server): c78088f</div></pre></td></tr></table></figure>
-
-<h3 id="Linux环境（CentOS）">Linux环境（CentOS）</h3>
-<p>1 配置epel yum，使用国内的repo访问速度比较快</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> /etc/yum.repos.d/</div><div class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-<span class="number">6</span>.repo </div><div class="line"><span class="comment">#wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.163.com/.help/CentOS6-Base-163.repo</span></div><div class="line">rpm -ivh http://mirrors.aliyun.com/epel/<span class="number">6</span>Server/x86_64/epel-release-<span class="number">6</span>-<span class="number">8</span>.noarch.rpm</div></pre></td></tr></table></figure>
-
-
-<p>2 yum更新</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum clean all && yum makecache && yum update -y</div></pre></td></tr></table></figure>
-
-
-<p>3 安装docker并启动docker服务</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">yum install docker-io</div><div class="line">service docker start </div><div class="line">chkconfig docker on</div><div class="line">docker version </div><div class="line">[root@master ~]<span class="comment"># docker version</span></div><div class="line">Client version: <span class="number">1.1</span>.<span class="number">2</span></div><div class="line">Client API version: <span class="number">1.13</span></div><div class="line">Go version (client): go1.<span class="number">2.2</span></div><div class="line">Git commit (client): d84a070/<span class="number">1.1</span>.<span class="number">2</span></div><div class="line">Server version: <span class="number">1.1</span>.<span class="number">2</span></div><div class="line">Server API version: <span class="number">1.13</span></div><div class="line">Go version (server): go1.<span class="number">2.2</span></div><div class="line">Git commit (server): d84a070/<span class="number">1.1</span>.<span class="number">2</span></div></pre></td></tr></table></figure>
-
-
-
-<hr>
-<h2 id="测试docker">测试docker</h2>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#run a simple echo command, that will echo hello world back to the console over standard out.</span></div><div class="line">$ docker run base /bin/<span class="built_in">echo</span> hello world</div><div class="line">hello world</div></pre></td></tr></table></figure>
-
-
-<p>看起来简单，但后台做了很多的事情：<br>1 Generated a new LXC container<br>2 Created a new file system<br>3 Mounted a read/write layer<br>4 Allocated network interface<br>5 Setup IP<br>6 Setup NATing<br>7 Executed the process in the container<br>8 Captured it’s output<br>9 Printed to screen</p>
-<h2 id="10_Stopped_the_container">10 Stopped the container</h2>
-<h2 id="构建CentOS基础镜像">构建CentOS基础镜像</h2>
-<p>使用 febootstrap 从yum源 构建简洁的CentOS 镜像 (由于Mac上没有febootstrap，在Linux环境上安装并制作基础镜像，然后导入到Mac上运行)</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">yum -y install febootstrap </div><div class="line"><span class="comment">#centos6-image -i 参数制定需要安装的软件</span></div><div class="line">febootstrap -i bash -i wget -i yum -i iputils -i iproute -i man -i vim-minimal centos65 centos65-image http://mirrors.aliyun.com/centos/<span class="number">6.5</span>/os/x86_64/</div></pre></td></tr></table></figure>
-
-
-<p>制作Docker镜像，镜像名字是centos6-base</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> centos65-image && tar -c .|docker import - centos65-base</div></pre></td></tr></table></figure>
-
-
-<p>查看镜像列表</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$docker</span> images </div><div class="line">[root@master centos65-image]<span class="comment"># docker  images</span></div><div class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</div><div class="line">centos65-base       latest              <span class="number">0</span>b1acae7bfea        <span class="number">18</span> seconds ago      <span class="number">292.3</span> MB</div></pre></td></tr></table></figure>
-
-
-<p>导出该基础镜像备份，可以使用save或者export命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$docker</span> save centos65-base &gt; /tmp/centos65-base-save.tar</div><div class="line"><span class="comment">#最好能压缩下，保持空间最小</span></div><div class="line"><span class="variable">$tar</span> zcvf centos65-base-save.tar.gz centos65-base-save.tar </div><div class="line"><span class="variable">$docker</span> <span class="keyword">export</span> <span class="number">6</span>c5563 &gt; /tmp/centos65-base-export.tar</div><div class="line"><span class="comment">#导出容器，6c5563是容器的id（不是镜像id），可以用docer ps -a 命令查看</span></div><div class="line"><span class="variable">$docker</span> images --tree</div></pre></td></tr></table></figure>
-
-
-
-<blockquote>
-<p>export 导出的是容器当用所用的镜像内容.<br>save 保存的是所有这个镜像的版本记录，包括一些历史数据.</p>
-</blockquote>
-<p>另外整理记录两个常用的命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$docker</span> rm $(docker ps -q <span class="operator">-a</span>) 一次性删除所有的容器，</div><div class="line"><span class="variable">$docker</span> rmi $(docker images -q) 一次性删除所有的镜像</div></pre></td></tr></table></figure>
-
-
-
-<p>到另外一台docker主机导入，此处是Mac环境</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">MacBookPro:~ hzchenkj<span class="variable">$docker</span> load &lt; /tmp/centos65-base.tar</div><div class="line">MacBookPro:~ hzchenkj$<span class="variable">$docer</span> images</div></pre></td></tr></table></figure>
-
-
-
-<hr>
-<h2 id="构建CentOS_SSH服务镜像">构建CentOS SSH服务镜像</h2>
-<p>制作可以ssh登陆的Docker镜像，名字是centos6-ssh,先创建目录</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mkdir  -p ~/docker/centos65-ssh</div><div class="line"><span class="built_in">cd</span> ~/docker/centos65-ssh</div></pre></td></tr></table></figure>
-
-
-<p>Dockerfile  创建文件</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#Dockerfile</span></div><div class="line">FROM centos65-base</div><div class="line">MAINTAINER hzchenkj &lt;hzchenkj@<span class="number">163</span>.com&gt;</div><div class="line">RUN rpm -ivh http://mirrors.aliyun.com/epel/<span class="number">6</span>Server/x86_64/epel-release-<span class="number">6</span>-<span class="number">8</span>.noarch.rpm</div><div class="line">RUN yum -y install openssh-server supervisor</div><div class="line">RUN rm -rf /var/cache/yum/</div><div class="line">RUN ssh-keygen -q -N <span class="string">""</span> -t dsa <span class="operator">-f</span> /etc/ssh/ssh_host_dsa_key</div><div class="line">RUN ssh-keygen -q -N <span class="string">""</span> -t rsa <span class="operator">-f</span> /etc/ssh/ssh_host_rsa_key</div><div class="line">RUN sed -ri <span class="string">'s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g'</span> /etc/pam.d/sshd</div><div class="line">RUN mkdir -p /root/.ssh && chown root.root /root && chmod <span class="number">700</span> /root/.ssh</div><div class="line">RUN <span class="built_in">echo</span> <span class="string">'root:123456'</span> | chpasswd</div><div class="line">ENV LANG en_US.UTF-<span class="number">8</span></div><div class="line">ENV LC_ALL en_US.UTF-<span class="number">8</span></div><div class="line">ADD supervisord.conf /etc/supervisord.conf</div><div class="line">EXPOSE <span class="number">8080</span> <span class="number">22</span></div><div class="line">CMD supervisord -c /etc/supervisord.conf</div></pre></td></tr></table></figure>
-
-
-
-
-<p>supervisord.conf  使用supervisord服务</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[supervisord]</div><div class="line">nodaemon=<span class="literal">true</span></div><div class="line">[program:sshd]</div><div class="line">command=/usr/sbin/sshd -D</div></pre></td></tr></table></figure>
-
-
-
-<p>开始构建</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[jun@master centos65-ssh]<span class="variable">$docker</span> build -t centos65-ssh ~/docker/centos65-ssh</div><div class="line"><span class="comment">#docker build -t centos65-ssh  - &lt; ~/docker/centos65-ssh/ssh.Dockerfile</span></div><div class="line">Sending build context to Docker daemon <span class="number">4.096</span> kB</div><div class="line">Sending build context to Docker daemon </div><div class="line">Step <span class="number">0</span> : FROM centos65-base</div><div class="line"> ---&gt; <span class="number">0</span>b1acae7bfea</div><div class="line">Step <span class="number">1</span> : MAINTAINER hzchenkj &lt;hzchenkj@<span class="number">163</span>.com&gt;</div><div class="line"> ---&gt; Running <span class="keyword">in</span> fdac76e3148b</div><div class="line"> ---&gt; d927b5f78971</div><div class="line">Removing intermediate container fdac76e3148b</div><div class="line">Step <span class="number">2</span> : RUN yum -y install openssh-server</div><div class="line"> ---&gt; Running <span class="keyword">in</span> e3dcbd612317</div></pre></td></tr></table></figure>
-
-
-
-<p>可以看到centos65-ssh 镜像</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[jun@master centos65-ssh]$ docker images </div><div class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</div><div class="line">centos65-ssh         latest              <span class="number">166</span>d41113466        <span class="number">13</span> seconds ago      <span class="number">311.3</span> MB</div><div class="line">centos65-base        latest              <span class="number">6</span>f5454ae061a        <span class="number">6</span> minutes ago       <span class="number">311.3</span> MB</div></pre></td></tr></table></figure>
-
-
-<p>运行镜像centos65-ssh ，暴露端口（docker run -d -P centos65-ssh）</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[jun@master centos65-ssh]$ docker run <span class="operator">-d</span> -p <span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">33301</span>:<span class="number">22</span> centos65-ssh</div><div class="line"><span class="number">867187</span>ab245f3edf79a4d422f9ac8be549baebf1367f7badfdf35de1c8005e1c</div><div class="line">[jun@master centos65-ssh]$ docker  ps </div><div class="line">CONTAINER ID        IMAGE                 COMMAND                CREATED             STATUS              PORTS                               NAMES</div><div class="line"><span class="number">867187</span>ab245f        centos65-ssh:latest   /bin/sh -c <span class="string">'supervis   3 seconds ago       Up 2 seconds        8080/tcp, 127.0.0.1:33301-&gt;22/tcp   elegant_wilson</span></div></pre></td></tr></table></figure>
-
-
-<p>ssh登陆容器：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[jun@master ~]$ ssh root@<span class="number">127.0</span>.<span class="number">0.1</span> -p <span class="number">33301</span></div><div class="line">The authenticity of host <span class="string">'[127.0.0.1]:33301 ([127.0.0.1]:33301)'</span> can<span class="string">'t be established.</span></div><div class="line">RSA key fingerprint is f4:f3:2c:21:a0:df:1e:00:a2:e0:e6:e4:ae:a1:0e:70.</div><div class="line">Are you sure you want to continue connecting (yes/no)? yes</div><div class="line">Warning: Permanently added '[<span class="number">127.0</span>.<span class="number">0.1</span>]:<span class="number">33301</span><span class="string">' (RSA) to the list of known hosts.</span></div><div class="line">root@127.0.0.1's password: </div><div class="line">-bash-<span class="number">4.1</span><span class="comment">#</span></div></pre></td></tr></table></figure>
-
-
-
-<p>关闭容器</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[jun@master centos65-ssh]$ docker  stop <span class="number">867187</span>ab245f</div><div class="line"><span class="number">867187</span>ab245f</div><div class="line">[jun@master centos65-ssh]$</div></pre></td></tr></table></figure>
-
-
-
-<p>后面使用这个centos65-ssh  来做基础的镜像，来构建Tomcat和Oracle 镜像</p>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2014/10/27/hello-world/">
-  <time datetime="2014-10-27T07:54:17.000Z">
-    10月 27 2014
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2014/10/27/hello-world/">Hello World 中文文章测试</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">trobuleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>. 欢迎大家来到LinuxCoffee的博客。该博客使用Hexo生成。并将文章发布到GitHub上。</p>
-<h2 id="入门指南">入门指南</h2>
-<h3 id="发表新的文章">发表新的文章</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
 
   <nav id="pagination">
   
+  
+    <a href="/page/2/" class="next">下一页</a>
   
   <div class="clearfix"></div>
 </nav>

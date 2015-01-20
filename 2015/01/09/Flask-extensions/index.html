@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>Flask extensions 汇总 | LinuxCoffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="hzchenkj">
+  
+  
+    <meta name="description" content="Flask 的扩张结构是在诞生的时候就确定了的。存在各种各样好用的扩张。这里整理了一些常用的扩张：1  Flask-script给flask提供命令行选项，可以在shell里进行调试，测试工作。pip install flask-scriptsfrom flask.ext.script import Managermanager = Manager(app)manager.run()
+python">
+  
+  <meta name="description" content="Flask 的扩张结构是在诞生的时候就确定了的。存在各种各样好用的扩张。这里整理了一些常用的扩张：1  Flask-script给flask提供命令行选项，可以在shell里进行调试，测试工作。pip install flask-scriptsfrom flask.ext.script import Managermanager = Manager(app)manager.run()
+python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flask extensions 汇总">
+<meta property="og:url" content="http://hzchenkj.github.com/2015/01/09/Flask-extensions/">
+<meta property="og:site_name" content="LinuxCoffee">
+<meta property="og:description" content="Flask 的扩张结构是在诞生的时候就确定了的。存在各种各样好用的扩张。这里整理了一些常用的扩张：1  Flask-script给flask提供命令行选项，可以在shell里进行调试，测试工作。pip install flask-scriptsfrom flask.ext.script import Managermanager = Manager(app)manager.run()
+python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flask extensions 汇总">
+<meta name="twitter:description" content="Flask 的扩张结构是在诞生的时候就确定了的。存在各种各样好用的扩张。这里整理了一些常用的扩张：1  Flask-script给flask提供命令行选项，可以在shell里进行调试，测试工作。pip install flask-scriptsfrom flask.ext.script import Managermanager = Manager(app)manager.run()
+python">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LinuxCoffee</a></h1>
+    <p><a href="/">东写西读</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+        <li><a href="/reading">Reading</a></li>
+      
+        <li><a href="/about">About</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content"><article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2015/01/09/Flask-extensions/">
+  <time datetime="2015-01-09T07:21:23.000Z">
+    1月 9 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title">Flask extensions 汇总</h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>Flask 的扩张结构是在诞生的时候就确定了的。存在各种各样好用的扩张。<br>这里整理了一些常用的扩张：<br>1  Flask-script<br>给flask提供命令行选项，可以在shell里进行调试，测试工作。<br>pip install flask-scripts<br>from flask.ext.script import Manager<br>manager = Manager(app)<br>manager.run()</p>
+<p>python test.py —help<br>python test.py shell<br>python test.py runserver -h 0.0.0.0 -p 5000</p>
+<p>2 Flask-Bootstrap<br>pip install flask-bootstrap</p>
+<p>from flask.ext.bootstrap import Bootstrap</p>
+<p>bootstrap = Bootstrap(app)</p>
+<p>user.html</p>
+<p>3 Flask-Moment 时间日期本地格式化<br>pip install flask-moment</p>
+<p>from flask.ext.moment import Moment<br>moment = Moment(app)</p>
+<p>index.html</p>
+<p>4 Flask-WTF Form表单<br>pip  install falsk-wtf</p>
+<p>Form Classes 继承自Form<br>from flask.ext.wtf import Form<br>from wtforms import StringField,SubmitField<br>from wtform.validators import Rrquired</p>
+<p>class NameForm(Form):<br>    name = StringField(‘What is your name?’,validators=[Required()])<br>    submit = SubmitField(‘Submit’)</p>
+<p> StringField<br> TextAreaField<br> PasswordField<br> HiddenField<br> DateField<br> DateTimeField<br> IntegerField<br> DecimalField<br> FloatField<br> BooleanField<br> RadioField<br> SelectField<br> SelectMultipleField<br> FielField<br> SubmitField<br> FormField<br> FieldList</p>
+<p>5 数据库<br>pip install flask-sqlalchemy<br>MySQL mysql://username:password@hostname/database</p>
+<p>2 Login<br>3 Form</p>
+
+    
+  </div>
+  <footer>
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="Flask extensions 汇总">
+  </div>
+</section>
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2015 <a href="/">hzchenkj</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="http://ajax.useso.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'hzchenkj' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>

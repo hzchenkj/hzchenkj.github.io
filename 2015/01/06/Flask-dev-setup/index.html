@@ -106,6 +106,18 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">(venv)<span class="variable">$python</span> index.py</div><div class="line"> * Running on http://<span class="number">0.0</span>.<span class="number">0.0</span>:<span class="number">5000</span>/</div><div class="line"> * Restarting with reloader</div></pre></td></tr></table></figure>
 
 <p> 浏览器输入<a href="http://localhost:5000" target="_blank" rel="external">http://localhost:5000</a> 就可以看到你的helloworld页面了。</p>
+<p>所有的Flask应用程序都需要创建一个app实例。服务响应客户端请求使用WSGI（Web Server Gateway Interace）。<br>路由和视图函数:<br>路由就是用来保持URL地址和函数的关系。可以使用装饰器@app.route 来暴露路由。URL 可以有静态和动态的方式声明。<br>/user/<name> ,/user/<int:id></int:id></name></p>
+<p>模板<br>from flask import render_template</p>
+<p>变量：<br> 变量<br>undefined 字典<br>undefined 列表<br>undefined 带变量的列表<br> 对象的方法<br> 管道： safe ,lower,upper,title,trim,striptags</p>
+<p>控制:<br>判断：</p>
+<pre><code><span class="variable">Hello</span>,<span class="variable">Stranger</span><span class="exclamation_mark">!</span>
+</code></pre><p> 循环</p>
+<p>‘’’bash<br> macro</p>
+<p>‘’’</p>
+<ul><br><br></ul>
+
+<p>支持在外部文件定义：<br>‘’’bash<br>{ macros.render_ct(comment) }<br>‘’’<br>支持将重复的内容抽象，然后include</p>
+<p>支持继承：</p>
 
     
   </div>

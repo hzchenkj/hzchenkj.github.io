@@ -1,0 +1,300 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>LinuxCoffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="hzchenkj">
+  
+  
+  <meta name="description" content="GNU/Linux | Java | Python | Docker | Shell">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LinuxCoffee">
+<meta property="og:url" content="http://hzchenkj.github.com/page/2/">
+<meta property="og:site_name" content="LinuxCoffee">
+<meta property="og:description" content="GNU/Linux | Java | Python | Docker | Shell">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LinuxCoffee">
+<meta name="twitter:description" content="GNU/Linux | Java | Python | Docker | Shell">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LinuxCoffee</a></h1>
+    <p><a href="/">东写西读</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+        <li><a href="/reading">Reading</a></li>
+      
+        <li><a href="/about">About</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content">
+
+
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2014/10/27/Docker-In-Action-docker-ssh/">
+  <time datetime="2014-10-27T14:02:50.000Z">
+    10月 27 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2014/10/27/Docker-In-Action-docker-ssh/">Docker In Action&lt;一&gt; 制作可以SSH登录的docker容器服务指北</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p><img src="http://hzchenkj-github-io.qiniudn.com/docker-logo.png" alt="docker-logo"><br><a href="http://www.docker.com" target="_blank" rel="external">Docker</a>官网 的示例中基本上采用的是Ubuntu来作为环境的，但大部分企业相比来说还是采用RedHat/CentOS 系列的比较多，故这里整理了一篇从yum源方式制作自己干净简单的Docker镜像开始，一步一步构建具有SSH功能，Java/Tomcat环境，用Supervisor来启动并监控服务，最后构建具有Oracle等企业应用服务的完整Docker镜像。</p>
+<h2 id="环境准备">环境准备</h2>
+<h3 id="Mac环境">Mac环境</h3>
+<p>我的电脑是Mac OS X，故使用brew来安装 <a href="http://boot2docker.io/" target="_blank" rel="external">Boot2docker</a> 来运行docker，安装过程中会从亚马逊下载Boot2docker ISO镜像，需要用VPN翻墙。另前期需要安装好<a href="https://www.virtualbox.org/" target="_blank" rel="external">VirtuBox</a>这个虚拟机软件。</p>
+<p>启动boot2docker</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">MacBookPro:~ hzchenkj<span class="variable">$boot2docker</span> start <span class="comment">#启动boot2dokcer,并根据提示设置环境变量</span></div><div class="line">Waiting <span class="keyword">for</span> VM and Docker daemon to start...</div><div class="line">......</div><div class="line">MacBookPro:~ hzchenkj<span class="variable">$export</span> DOCKER_HOST=tcp://<span class="number">192.168</span>.<span class="number">59.103</span>:<span class="number">2376</span></div></pre></td></tr></table></figure>
+
+
+
+<p>然后查看下docker的版本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">MacBookPro:hzchenkj$ docker  version</div><div class="line">Client version: <span class="number">1.3</span>.<span class="number">0</span></div><div class="line">Client API version: <span class="number">1.15</span></div><div class="line">Go version (client): go1.<span class="number">3.3</span></div><div class="line">Git commit (client): c78088f</div><div class="line">OS/Arch (client): darwin/amd64</div><div class="line">Server version: <span class="number">1.3</span>.<span class="number">0</span></div><div class="line">Server API version: <span class="number">1.15</span></div><div class="line">Go version (server): go1.<span class="number">3.3</span></div><div class="line">Git commit (server): c78088f</div></pre></td></tr></table></figure>
+
+<h3 id="Linux环境（CentOS）">Linux环境（CentOS）</h3>
+<p>1 配置epel yum，使用国内的repo访问速度比较快</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> /etc/yum.repos.d/</div><div class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-<span class="number">6</span>.repo </div><div class="line"><span class="comment">#wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.163.com/.help/CentOS6-Base-163.repo</span></div><div class="line">rpm -ivh http://mirrors.aliyun.com/epel/<span class="number">6</span>Server/x86_64/epel-release-<span class="number">6</span>-<span class="number">8</span>.noarch.rpm</div></pre></td></tr></table></figure>
+
+
+<p>2 yum更新</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum clean all && yum makecache && yum update -y</div></pre></td></tr></table></figure>
+
+
+<p>3 安装docker并启动docker服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">yum install docker-io</div><div class="line">service docker start </div><div class="line">chkconfig docker on</div><div class="line">docker version </div><div class="line">[root@master ~]<span class="comment"># docker version</span></div><div class="line">Client version: <span class="number">1.1</span>.<span class="number">2</span></div><div class="line">Client API version: <span class="number">1.13</span></div><div class="line">Go version (client): go1.<span class="number">2.2</span></div><div class="line">Git commit (client): d84a070/<span class="number">1.1</span>.<span class="number">2</span></div><div class="line">Server version: <span class="number">1.1</span>.<span class="number">2</span></div><div class="line">Server API version: <span class="number">1.13</span></div><div class="line">Go version (server): go1.<span class="number">2.2</span></div><div class="line">Git commit (server): d84a070/<span class="number">1.1</span>.<span class="number">2</span></div></pre></td></tr></table></figure>
+
+
+
+<hr>
+<h2 id="测试docker">测试docker</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#run a simple echo command, that will echo hello world back to the console over standard out.</span></div><div class="line">$ docker run base /bin/<span class="built_in">echo</span> hello world</div><div class="line">hello world</div></pre></td></tr></table></figure>
+
+
+<p>看起来简单，但后台做了很多的事情：<br>1 Generated a new LXC container<br>2 Created a new file system<br>3 Mounted a read/write layer<br>4 Allocated network interface<br>5 Setup IP<br>6 Setup NATing<br>7 Executed the process in the container<br>8 Captured it’s output<br>9 Printed to screen</p>
+<h2 id="10_Stopped_the_container">10 Stopped the container</h2>
+<h2 id="构建CentOS基础镜像">构建CentOS基础镜像</h2>
+<p>使用 febootstrap 从yum源 构建简洁的CentOS 镜像 (由于Mac上没有febootstrap，在Linux环境上安装并制作基础镜像，然后导入到Mac上运行)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">yum -y install febootstrap </div><div class="line"><span class="comment">#centos6-image -i 参数制定需要安装的软件</span></div><div class="line">febootstrap -i bash -i wget -i yum -i iputils -i iproute -i man -i vim-minimal centos65 centos65-image http://mirrors.aliyun.com/centos/<span class="number">6.5</span>/os/x86_64/</div></pre></td></tr></table></figure>
+
+
+<p>制作Docker镜像，镜像名字是centos6-base</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> centos65-image && tar -c .|docker import - centos65-base</div></pre></td></tr></table></figure>
+
+
+<p>查看镜像列表</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$docker</span> images </div><div class="line">[root@master centos65-image]<span class="comment"># docker  images</span></div><div class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</div><div class="line">centos65-base       latest              <span class="number">0</span>b1acae7bfea        <span class="number">18</span> seconds ago      <span class="number">292.3</span> MB</div></pre></td></tr></table></figure>
+
+
+<p>导出该基础镜像备份，可以使用save或者export命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$docker</span> save centos65-base &gt; /tmp/centos65-base-save.tar</div><div class="line"><span class="comment">#最好能压缩下，保持空间最小</span></div><div class="line"><span class="variable">$tar</span> zcvf centos65-base-save.tar.gz centos65-base-save.tar </div><div class="line"><span class="variable">$docker</span> <span class="keyword">export</span> <span class="number">6</span>c5563 &gt; /tmp/centos65-base-export.tar</div><div class="line"><span class="comment">#导出容器，6c5563是容器的id（不是镜像id），可以用docer ps -a 命令查看</span></div><div class="line"><span class="variable">$docker</span> images --tree</div></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>export 导出的是容器当用所用的镜像内容.<br>save 保存的是所有这个镜像的版本记录，包括一些历史数据.</p>
+</blockquote>
+<p>另外整理记录两个常用的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$docker</span> rm $(docker ps -q <span class="operator">-a</span>) 一次性删除所有的容器，</div><div class="line"><span class="variable">$docker</span> rmi $(docker images -q) 一次性删除所有的镜像</div></pre></td></tr></table></figure>
+
+
+
+<p>到另外一台docker主机导入，此处是Mac环境</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">MacBookPro:~ hzchenkj<span class="variable">$docker</span> load &lt; /tmp/centos65-base.tar</div><div class="line">MacBookPro:~ hzchenkj$<span class="variable">$docer</span> images</div></pre></td></tr></table></figure>
+
+
+
+<hr>
+<h2 id="构建CentOS_SSH服务镜像">构建CentOS SSH服务镜像</h2>
+<p>制作可以ssh登陆的Docker镜像，名字是centos6-ssh,先创建目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mkdir  -p ~/docker/centos65-ssh</div><div class="line"><span class="built_in">cd</span> ~/docker/centos65-ssh</div></pre></td></tr></table></figure>
+
+
+<p>Dockerfile  创建文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#Dockerfile</span></div><div class="line">FROM centos65-base</div><div class="line">MAINTAINER hzchenkj &lt;hzchenkj@<span class="number">163</span>.com&gt;</div><div class="line">RUN rpm -ivh http://mirrors.aliyun.com/epel/<span class="number">6</span>Server/x86_64/epel-release-<span class="number">6</span>-<span class="number">8</span>.noarch.rpm</div><div class="line">RUN yum -y install openssh-server supervisor</div><div class="line">RUN rm -rf /var/cache/yum/</div><div class="line">RUN ssh-keygen -q -N <span class="string">""</span> -t dsa <span class="operator">-f</span> /etc/ssh/ssh_host_dsa_key</div><div class="line">RUN ssh-keygen -q -N <span class="string">""</span> -t rsa <span class="operator">-f</span> /etc/ssh/ssh_host_rsa_key</div><div class="line">RUN sed -ri <span class="string">'s/session    required     pam_loginuid.so/#session    required     pam_loginuid.so/g'</span> /etc/pam.d/sshd</div><div class="line">RUN mkdir -p /root/.ssh && chown root.root /root && chmod <span class="number">700</span> /root/.ssh</div><div class="line">RUN <span class="built_in">echo</span> <span class="string">'root:123456'</span> | chpasswd</div><div class="line">ENV LANG en_US.UTF-<span class="number">8</span></div><div class="line">ENV LC_ALL en_US.UTF-<span class="number">8</span></div><div class="line">ADD supervisord.conf /etc/supervisord.conf</div><div class="line">EXPOSE <span class="number">8080</span> <span class="number">22</span></div><div class="line">CMD supervisord -c /etc/supervisord.conf</div></pre></td></tr></table></figure>
+
+
+
+
+<p>supervisord.conf  使用supervisord服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[supervisord]</div><div class="line">nodaemon=<span class="literal">true</span></div><div class="line">[program:sshd]</div><div class="line">command=/usr/sbin/sshd -D</div></pre></td></tr></table></figure>
+
+
+
+<p>开始构建</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[jun@master centos65-ssh]<span class="variable">$docker</span> build -t centos65-ssh ~/docker/centos65-ssh</div><div class="line"><span class="comment">#docker build -t centos65-ssh  - &lt; ~/docker/centos65-ssh/ssh.Dockerfile</span></div><div class="line">Sending build context to Docker daemon <span class="number">4.096</span> kB</div><div class="line">Sending build context to Docker daemon </div><div class="line">Step <span class="number">0</span> : FROM centos65-base</div><div class="line"> ---&gt; <span class="number">0</span>b1acae7bfea</div><div class="line">Step <span class="number">1</span> : MAINTAINER hzchenkj &lt;hzchenkj@<span class="number">163</span>.com&gt;</div><div class="line"> ---&gt; Running <span class="keyword">in</span> fdac76e3148b</div><div class="line"> ---&gt; d927b5f78971</div><div class="line">Removing intermediate container fdac76e3148b</div><div class="line">Step <span class="number">2</span> : RUN yum -y install openssh-server</div><div class="line"> ---&gt; Running <span class="keyword">in</span> e3dcbd612317</div></pre></td></tr></table></figure>
+
+
+
+<p>可以看到centos65-ssh 镜像</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[jun@master centos65-ssh]$ docker images </div><div class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE</div><div class="line">centos65-ssh         latest              <span class="number">166</span>d41113466        <span class="number">13</span> seconds ago      <span class="number">311.3</span> MB</div><div class="line">centos65-base        latest              <span class="number">6</span>f5454ae061a        <span class="number">6</span> minutes ago       <span class="number">311.3</span> MB</div></pre></td></tr></table></figure>
+
+
+<p>运行镜像centos65-ssh ，暴露端口（docker run -d -P centos65-ssh）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[jun@master centos65-ssh]$ docker run <span class="operator">-d</span> -p <span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">33301</span>:<span class="number">22</span> centos65-ssh</div><div class="line"><span class="number">867187</span>ab245f3edf79a4d422f9ac8be549baebf1367f7badfdf35de1c8005e1c</div><div class="line">[jun@master centos65-ssh]$ docker  ps </div><div class="line">CONTAINER ID        IMAGE                 COMMAND                CREATED             STATUS              PORTS                               NAMES</div><div class="line"><span class="number">867187</span>ab245f        centos65-ssh:latest   /bin/sh -c <span class="string">'supervis   3 seconds ago       Up 2 seconds        8080/tcp, 127.0.0.1:33301-&gt;22/tcp   elegant_wilson</span></div></pre></td></tr></table></figure>
+
+
+<p>ssh登陆容器：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[jun@master ~]$ ssh root@<span class="number">127.0</span>.<span class="number">0.1</span> -p <span class="number">33301</span></div><div class="line">The authenticity of host <span class="string">'[127.0.0.1]:33301 ([127.0.0.1]:33301)'</span> can<span class="string">'t be established.</span></div><div class="line">RSA key fingerprint is f4:f3:2c:21:a0:df:1e:00:a2:e0:e6:e4:ae:a1:0e:70.</div><div class="line">Are you sure you want to continue connecting (yes/no)? yes</div><div class="line">Warning: Permanently added '[<span class="number">127.0</span>.<span class="number">0.1</span>]:<span class="number">33301</span><span class="string">' (RSA) to the list of known hosts.</span></div><div class="line">root@127.0.0.1's password: </div><div class="line">-bash-<span class="number">4.1</span><span class="comment">#</span></div></pre></td></tr></table></figure>
+
+
+
+<p>关闭容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[jun@master centos65-ssh]$ docker  stop <span class="number">867187</span>ab245f</div><div class="line"><span class="number">867187</span>ab245f</div><div class="line">[jun@master centos65-ssh]$</div></pre></td></tr></table></figure>
+
+
+
+<p>后面使用这个centos65-ssh  来做基础的镜像，来构建Tomcat和Oracle 镜像</p>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2014/10/27/hello-world/">
+  <time datetime="2014-10-27T07:54:17.000Z">
+    10月 27 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2014/10/27/hello-world/">Hello World 中文文章测试</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">trobuleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>. 欢迎大家来到LinuxCoffee的博客。该博客使用Hexo生成。并将文章发布到GitHub上。</p>
+<h2 id="入门指南">入门指南</h2>
+<h3 id="发表新的文章">发表新的文章</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+
+<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run_server">Run server</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+
+<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate_static_files">Generate static files</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+
+<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+
+<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+
+  <nav id="pagination">
+  
+    <a href="/" class="prev">上一页</a>
+  
+  
+  <div class="clearfix"></div>
+</nav>
+
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2015 <a href="/">hzchenkj</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="http://ajax.useso.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'hzchenkj' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>
