@@ -60,6 +60,107 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2014/10/30/Docker-In-Action-docker-tomcat-httpd/">
+  <time datetime="2014-10-30T12:54:44.000Z">
+    10月 30 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2014/10/30/Docker-In-Action-docker-tomcat-httpd/">Docker In Action&lt;二&gt; 制作可以SSH登录的web容器服务指北</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p><img src="http://hzchenkj-github-io.qiniudn.com/tomcat.png" alt="Apache Tomcat"></p>
+<p>本篇基于前面文章<a href="http://hzchenkj.github.io/2014/10/27/Docker-In-Action-docker-ssh/" target="_blank" rel="external">Docker In Action&lt;一&gt; 制作可以SSH登录的docker容器服务指北</a>生成的centos65-ssh开始制作web服务器，使用httpd或者Tomcat来提供web服务（使用supervisor和volumn 方式来制作服务)。</p>
+<h2 id="构建httpd_web服务器">构建httpd web服务器</h2>
+<p>一、构建http web服务容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mkdir -p ~/docker/webserver</div><div class="line"><span class="built_in">cd</span> ~/docker/webserver</div></pre></td></tr></table></figure>
+
+
+<p>Dockerfile</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">cat &gt;&gt; ~/docker/webserver/Dockerfile &lt;&lt; EOF</div><div class="line">FROM centos65-ssh</div><div class="line">MAINTAINER hzchenkj</div><div class="line">RUN yum install -y httpd</div><div class="line">RUN yum clean all</div><div class="line">RUN <span class="built_in">echo</span> <span class="string">"A simple Docker webserver"</span> &gt; /var/www/html/index.html</div><div class="line">ADD supervisord.conf /etc/supervisord.conf</div><div class="line">EXPOSE <span class="number">80</span></div><div class="line">EOF</div></pre></td></tr></table></figure>
+
+
+
+<p>supervisord.conf  使用supervisord服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">cat &gt;&gt; ~/docker/webserver/supervisord.conf &lt;&lt; EOF</div><div class="line">[supervisord]</div><div class="line">nodaemon=<span class="literal">true</span></div><div class="line">[program:sshd]</div><div class="line">command=/usr/sbin/sshd -D</div><div class="line">[program:httpd]</div><div class="line">command=/usr/sbin/httpd -D FOREGROUND</div><div class="line">EOF</div></pre></td></tr></table></figure>
+
+
+
+<p>构建容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[root@master webserver]<span class="comment"># docker build -t centos65-webserver ~/docker/webserver/</span></div><div class="line">Sending build context to Docker daemon <span class="number">3.584</span> kB</div><div class="line">Sending build context to Docker daemon </div><div class="line">Step <span class="number">0</span> : FROM centos65-ssh</div><div class="line"> ---&gt; <span class="number">394</span>fac76f4b2</div><div class="line">Step <span class="number">1</span> : MAINTAINER hzchenkj</div><div class="line"> ---&gt; Running <span class="keyword">in</span> <span class="number">1</span>ccb987bae63</div><div class="line"> ---&gt; ec16a945cba3</div><div class="line">Removing intermediate container <span class="number">1</span>ccb987bae63</div><div class="line">Step <span class="number">2</span> : RUN yum install -y httpd</div><div class="line"> ---&gt; Running <span class="keyword">in</span> ee586632d936</div><div class="line">Loaded plugins: fastestmirror</div></pre></td></tr></table></figure>
+
+
+
+<p>查看镜像</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@master webserver]<span class="comment"># docker  images</span></div><div class="line">REPOSITORY           TAG                 IMAGE ID            CREATED              VIRTUAL SIZE</div><div class="line">centos65-webserver   latest              <span class="number">66</span>b7f5ed174f        About a minute ago   <span class="number">449.1</span> MB</div><div class="line">centos65-ssh         latest              <span class="number">394</span>fac76f4b2        <span class="number">3</span> hours ago          <span class="number">366.4</span> MB</div><div class="line">centos65-base        latest              <span class="number">0</span>b1acae7bfea        <span class="number">11</span> hours ago         <span class="number">292.3</span> MB</div></pre></td></tr></table></figure>
+
+
+
+<p>启动webserver容器，端口80映射到本机5001端口：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root@master webserver]<span class="comment"># docker run -d -p 5001:80 centos65-webserver</span></div><div class="line"><span class="number">0636</span>d5bf9e9b85ffc804012a2d6bd7af78080e85e674bd5975d64a1f126376ac</div></pre></td></tr></table></figure>
+
+
+<p>查看启动的webserver容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">[root@master webserver]<span class="comment"># docker  ps </span></div><div class="line">CONTAINER ID        IMAGE                       COMMAND                CREATED              STATUS              PORTS                                    NAMES</div><div class="line"><span class="number">0636</span>d5bf9e9b        centos65-webserver:latest   /bin/sh -c <span class="string">'supervis   About a minute ago   Up About a minute   22/tcp, 8080/tcp, 0.0.0.0:5001-&gt;80/tcp   berserk_kirch  </span></div><div class="line">[root@master webserver]# docker logs 0636d5bf9e9b</div><div class="line">2014-10-29 00:08:10,977 CRIT Supervisor running as root (no user in config file)</div><div class="line">2014-10-29 00:08:10,986 INFO supervisord started with pid 1</div><div class="line">2014-10-29 00:08:10,988 INFO spawned: 'httpd<span class="string">' with pid 8</span></div><div class="line">2014-10-29 00:08:10,989 INFO spawned: 'sshd<span class="string">' with pid 9</span></div><div class="line">2014-10-29 00:08:11,987 INFO success: httpd entered RUNNING state, process has stayed up for &gt; than 1 seconds (startsecs)</div><div class="line">2014-10-29 00:08:11,988 INFO success: sshd entered RUNNING state, process has stayed up for &gt; than 1 seconds (startsecs)</div><div class="line">[root@master webserver]#</div></pre></td></tr></table></figure>
+
+
+<p>访问wenb服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root@master webserver]<span class="comment"># curl localhost:5001</span></div><div class="line">A simple Docker webserver</div><div class="line">[root@master webserver]<span class="comment">#</span></div></pre></td></tr></table></figure>
+
+
+
+
+<h2 id="构建Tomcat_web服务器">构建Tomcat web服务器</h2>
+<p>可以用yum来安装Tomcat服务也可以自己从<a href="http://tomcat.apache.org" target="_blank" rel="external">Tomcat</a>官方网站下载tomcat包和jdk文件进行发布。<br>本处使用存手工方式来安装JDK，设置环境变量并安装tomcat服务。<br>使用volumn方式来发布web服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">mkdir -p ~/docker/tomcat</div><div class="line"><span class="built_in">cd</span> ~/docker/tomcat</div><div class="line">touch ~/docker/tomcat/Dockerfile</div><div class="line"><span class="built_in">cd</span> /usr/local/src</div><div class="line">wget http://**/jdk1.<span class="number">6.0</span>_38.tar.gz</div><div class="line">wget http://mirrors.cnnic.cn/apache/tomcat/tomcat-<span class="number">6</span>/v6.<span class="number">0.41</span>/bin/apache-tomcat-<span class="number">6.0</span>.<span class="number">41</span>.tar.gz</div><div class="line">mkdir -p /Docker_Volume/webapps</div></pre></td></tr></table></figure>
+
+
+<p>Dockerfile</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">FROM centos65-ssh</div><div class="line">MAINTAINER chenkj &lt;hzchenkj@<span class="number">163</span>.com&gt;</div><div class="line"><span class="comment">#RUN yum -y install tomcat6</span></div><div class="line"><span class="comment">#RUN yum -y install tomcat6-webapps</span></div><div class="line"><span class="comment">#安装jdk</span></div><div class="line">ADD /usr/local/src/jdk1.<span class="number">6.0</span>_38.tar.gz /tmp/jdk1.<span class="number">6.0</span>_38.tar.gz</div><div class="line">RUN mv /tmp/jdk1.<span class="number">6.0</span>_38.tar.gz/jdk1.<span class="number">6.0</span>_38 /opt</div><div class="line">RUN rm -rf /tmp/jdk1.<span class="number">6.0</span>_38.tar.gz</div><div class="line"><span class="comment">#安装tomcat</span></div><div class="line">ADD /usr/local/src/apache-tomcat-<span class="number">6.0</span>.<span class="number">41</span>.tar.gz /tmp/apache-tomcat-<span class="number">6.0</span>.<span class="number">41</span>.tar.gz</div><div class="line">RUN mv /tmp/apache-tomcat-<span class="number">6.0</span>.<span class="number">41</span>.tar.gz/apache-tomcat-<span class="number">6.0</span>.<span class="number">41</span> /opt</div><div class="line">RUN rm -rf /tmp/apache-tomcat-<span class="number">6.0</span>.<span class="number">41</span>.tar.gz</div><div class="line"><span class="comment">#设置环境变量</span></div><div class="line">ENV JAVA_HOME /opt/jdk1.<span class="number">6.0</span>_38</div><div class="line">ENV PATH <span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$PATH</span></div><div class="line"><span class="comment">#增加volume 目录</span></div><div class="line">VOLUME [<span class="string">"/Docker_Volume"</span>]</div><div class="line"><span class="comment">#增加supervisor服务</span></div><div class="line">ADD supervisord.conf /etc/supervisord.conf</div><div class="line">EXPOSE <span class="number">8080</span></div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#RUN sed -i 's/appBase="webapps"/appBase="/Docker_Volume/webapps"/g' /opt/apache-tomcat-6.0.41/conf/server.xml</span></div><div class="line"><span class="comment">#ENTRYPOINT /opt/apache-tomcat-6.0.41/bin/startup.sh && tail -f /opt/apache-tomcat-6.0.41/logs/catalina.out</span></div></pre></td></tr></table></figure>
+
+
+
+
+<p>supervisord.conf</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[supervisord]</div><div class="line">nodaemon=<span class="literal">true</span></div><div class="line"><span class="comment">#sshd 服务</span></div><div class="line">[program:sshd]</div><div class="line">command=/usr/sbin/sshd -D</div><div class="line"><span class="comment">#tomcat服务</span></div><div class="line">[program:tomcat]</div><div class="line">command= /opt/apache-tomcat-<span class="number">6.0</span>.<span class="number">41</span>/bin/startup.sh && tail <span class="operator">-f</span> /opt/apache-tomcat-<span class="number">6.0</span>.<span class="number">41</span>/logs/catalina.out</div></pre></td></tr></table></figure>
+
+
+<p>构建tomcat服务容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#docker build -t centos65-tomcat .</span></div></pre></td></tr></table></figure>
+
+
+<p>运行tomcat容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#docker run -d  -P centos65-tomcat</span></div></pre></td></tr></table></figure>
+
+
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2014/10/27/Docker-In-Action-docker-ssh/">
   <time datetime="2014-10-27T14:02:50.000Z">
     10月 27 2014
