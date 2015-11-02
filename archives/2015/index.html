@@ -63,7 +63,7 @@
     
       <div class="icon"></div>
       <a href="/2015/11/02/zabbix-api/">
-  <time datetime="2015-11-02T14:13:36.000Z">
+  <time datetime="2015-11-02T14:17:07.000Z">
     11月 2 2015
   </time>
 </a>
@@ -110,11 +110,20 @@
 <li>auth  认证令牌  </li>
 </ol>
 <h2 id="API_使用">API 使用</h2>
-<p>登录</p>
+<p>1 登录</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>:<span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"user.login"</span>,<span class="string">"params"</span>:{<span class="string">"user"</span>:<span class="string">"***"</span>,<span class="string">"password"</span>:<span class="string">"***"</span>},<span class="string">"auth"</span>:null,<span class="string">"id"</span>:0}' http://zabbix.<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>.info/api_jsonrpc.php</div></pre></td></tr></table></figure>
 
-<p>获取主机</p>
+<p>2 获取主机</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>:<span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"host.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:[<span class="string">"hostid"</span>,<span class="string">"name"</span>],<span class="string">"filter"</span>:{<span class="string">"host"</span>:<span class="string">""</span>}},<span class="string">"auth"</span>:<span class="string">"22ad296ae1ac36a07d16ea91d7af7227"</span>,<span class="string">"id"</span>:1}' http://zabbix.<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>.info/api_jsonrpc.php</div></pre></td></tr></table></figure>
+
+<p>3 获取监控主机的hostids</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"host.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:[<span class="string">"hostid"</span>],<span class="string">"filter"</span>: {<span class="string">"host"</span>:<span class="string">"192.168.11.1"</span>}},<span class="string">"auth"</span>: <span class="string">"22ad296ae1ac36a07d16ea91d7af7227"</span>,<span class="string">"id"</span>: <span class="number">0</span>}' http:<span class="comment">//x.x.x.x/api_jsonrpc.php</span></div><div class="line">#<span class="string">"hostid"</span>:<span class="string">"10243"</span></div></pre></td></tr></table></figure>
+
+<p>（3）获得监控项itemids</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"item.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:<span class="string">"itemids"</span>,<span class="string">"hostids"</span>:<span class="string">"10243"</span>,<span class="string">"search"</span>:{<span class="string">"key_"</span>:<span class="string">"system.cpu.util</span></div><div class="line">[,idle,avg1]"}},<span class="string">"auth"</span>: <span class="string">"a826fca79a0795ccc1224dc76329972f"</span>,<span class="string">"id"</span>: <span class="number">0</span>}' http:<span class="comment">//x.x.x.x/api_jsonrpc.php</span></div><div class="line">#“item”:<span class="string">"24526"</span></div></pre></td></tr></table></figure>
+
+<p>(4)获取监控项”system.cpu.util[,idle,avg1] “在2014.2.19 14:00~14:20的值</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H <span class="string">'Content-Type: application/json'</span> -d <span class="string">'{"</span>jsonrpc<span class="string">": "</span><span class="number">2.0</span><span class="string">","</span>method<span class="string">":"</span><span class="transposed_variable">history.</span>get<span class="string">","</span>params<span class="string">":{"</span>history<span class="string">":0,"</span>itemids<span class="string">":["</span><span class="number">24526</span><span class="string">"],"</span>time_from<span class="string">":"</span><span class="number">1392789600</span><span class="string">","</span>time_till<span class="string">":"</span><span class="number">1392790200</span><span class="string">","</span>output<span class="string">":"</span>extend<span class="string">"},"</span>auth<span class="string">": "</span>a826fca79a0795ccc1224dc76329972f<span class="string">","</span>id<span class="string">": 0}'</span> http:<span class="comment">//x.x.x.x/api_jsonrpc.php</span></div></pre></td></tr></table></figure>
 
 <h2 id="参考地址">参考地址</h2>
 <p><a href="https://www.zabbix.com/documentation/2.4/manual/api" target="_blank" rel="external">https://www.zabbix.com/documentation/2.4/manual/api</a> </p>
