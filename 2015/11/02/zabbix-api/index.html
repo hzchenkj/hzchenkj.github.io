@@ -73,7 +73,7 @@ zabbi">
     
       <div class="icon"></div>
       <a href="/2015/11/02/zabbix-api/">
-  <time datetime="2015-11-02T07:57:40.000Z">
+  <time datetime="2015-11-02T14:13:36.000Z">
     11月 2 2015
   </time>
 </a>
@@ -96,6 +96,8 @@ zabbi">
 <li>远程管理zabbix 配置</li>
 <li>远程检索配置和历史数据</li>
 </ol>
+<h2 id="zabbix_API开发库">zabbix API开发库</h2>
+<p>zabbix API请求和响应都是json，并且还提供了各种语法的lib库，<a href="http://zabbix.org/wiki/Docs/api/libraries" target="_blank" rel="external">http://zabbix.org/wiki/Docs/api/libraries</a>，包含php、c#、Python、Perl、go等等语言</p>
 <h2 id="使用JSON">使用JSON</h2>
 <p>采用JSON RPC协议实现。调用任何函数，都要发送POST请求，输入输出都是JSON格式。<br>工作方式如下：</p>
 <ol>
@@ -119,11 +121,13 @@ zabbi">
 </ol>
 <h2 id="API_使用">API 使用</h2>
 <p>登录</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H <span class="symbol">'Content</span>-Type:application/json' -d'{<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"user.authenticate"</span>,<span class="string">"params"</span>:{<span class="string">"user"</span>:<span class="string">"duobao"</span>,<span class="string">"password"</span>:<span class="string">"zabbix"</span>},<span class="string">"auth"</span>: <span class="keyword">null</span>,<span class="string">"id"</span>:<span class="number">0</span>}' http:<span class="comment">//zabbix.wacai.info/api_jsonrpc.php</span></div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>:<span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"user.login"</span>,<span class="string">"params"</span>:{<span class="string">"user"</span>:<span class="string">"***"</span>,<span class="string">"password"</span>:<span class="string">"***"</span>},<span class="string">"auth"</span>:null,<span class="string">"id"</span>:0}' http://zabbix.<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>.info/api_jsonrpc.php</div></pre></td></tr></table></figure>
 
 <p>获取主机</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H <span class="string">'Content-Type: application/json'</span> -d <span class="string">'{"</span>jsonrpc<span class="string">":"</span><span class="number">2.0</span><span class="string">","</span>method<span class="string">":"</span><span class="transposed_variable">host.</span>get<span class="string">","</span>params<span class="string">":{"</span>output<span class="string">":["</span>hostid<span class="string">","</span>name<span class="string">"],"</span>filter<span class="string">":{"</span>host<span class="string">":"</span><span class="string">"}},"</span>auth<span class="string">":"</span>ecc543db662930c122b5fbedee60cc63<span class="string">","</span>id<span class="string">":1}'</span> http:<span class="comment">//monitor.example.com/api_jsonrpc.php</span></div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>:<span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"host.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:[<span class="string">"hostid"</span>,<span class="string">"name"</span>],<span class="string">"filter"</span>:{<span class="string">"host"</span>:<span class="string">""</span>}},<span class="string">"auth"</span>:<span class="string">"22ad296ae1ac36a07d16ea91d7af7227"</span>,<span class="string">"id"</span>:1}' http://zabbix.<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>.info/api_jsonrpc.php</div></pre></td></tr></table></figure>
 
+<h2 id="参考地址">参考地址</h2>
+<p><a href="https://www.zabbix.com/documentation/2.4/manual/api" target="_blank" rel="external">https://www.zabbix.com/documentation/2.4/manual/api</a> </p>
 
     
   </div>
