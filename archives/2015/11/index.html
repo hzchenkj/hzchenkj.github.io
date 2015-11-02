@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>归档: 2015/11 | LinuxCoffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="hzchenkj">
+  
+  
+  <meta name="description" content="GNU/Linux | Java | Python | Docker | Shell">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LinuxCoffee">
+<meta property="og:url" content="http://hzchenkj.github.com/archives/2015/11/">
+<meta property="og:site_name" content="LinuxCoffee">
+<meta property="og:description" content="GNU/Linux | Java | Python | Docker | Shell">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LinuxCoffee">
+<meta name="twitter:description" content="GNU/Linux | Java | Python | Docker | Shell">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LinuxCoffee</a></h1>
+    <p><a href="/">东写西读</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+        <li><a href="/reading">Reading</a></li>
+      
+        <li><a href="/about">About</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content">
+
+
+<h2 class="archives-title"><span>2015</span></h2>
+
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2015/11/02/zabbix-api/">
+  <time datetime="2015-11-02T07:57:40.000Z">
+    11月 2 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/11/02/zabbix-api/"></a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <h1 id="zabbix_api">zabbix api</h1>
+<h2 id="简介">简介</h2>
+<p>zabbix api 为批量操作，第三方软件集成及其他作用提供可编程接口。</p>
+<p>zabbix api 在1.8版本以后开始提供，zabbix移动客户端和原生的web前端部分都是建立在zabbix api上。zabbix api中间件使得架构更加模块化并避免对数据库进行操作。允许你使用JSON RPC协议来创建、更新和获取zabbix 对象并操作（认证你的账户）。</p>
+<p>zabbix api 提供两项功能：</p>
+<ol>
+<li>远程管理zabbix 配置</li>
+<li>远程检索配置和历史数据</li>
+</ol>
+<h2 id="使用JSON">使用JSON</h2>
+<p>采用JSON RPC协议实现。调用任何函数，都要发送POST请求，输入输出都是JSON格式。<br>工作方式如下：</p>
+<ol>
+<li>准备JSON对象，描述你想要做什么(创建主机，获取图像，更新监控项)</li>
+<li>采用POST方式 <a href="http://zabbix.wacai.info/zabbix/api_jsonrpc.php发送此JSON对象" target="_blank" rel="external">http://zabbix.wacai.info/zabbix/api_jsonrpc.php发送此JSON对象</a>. <a href="http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。" target="_blank" rel="external">http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。</a></li>
+<li>获取json响应格式</li>
+</ol>
+<blockquote>
+<p>请求方法必须是POST方法，HTTP Header  Content-Type  必须为【application/jsonrequest，application/json-rpc，application/json】其中之一</p>
+</blockquote>
+<h2 id="基本请求格式">基本请求格式</h2>
+<p>JSON 请求如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">{</div><div class="line">    "<span class="attribute">jsonrpc</span>": <span class="value"><span class="string">"2.0"</span></span>,</div><div class="line">    "<span class="attribute">method</span>": <span class="value"><span class="string">"method.name"</span></span>, </div><div class="line">    "<span class="attribute">params</span>": <span class="value">{</span></div><div class="line">        "<span class="attribute">param_1_name</span>": <span class="value"><span class="string">"param_1_value"</span></span>,</div><div class="line">        "<span class="attribute">param_2_name</span>": <span class="value"><span class="string">"param_2_value"</span> </span></div><div class="line">    },</div><div class="line">    "<span class="attribute">id</span>": <span class="value"><span class="number">1</span></span>,</div><div class="line">    "<span class="attribute">auth</span>": <span class="value"><span class="string">"159121b60d19a9b4b55d49e30cf12b81"</span></span>,</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<ol>
+<li>json rpc协议版本</li>
+<li>具体执行的操作 如:host.create item.update</li>
+<li>传递json对象来作为参数,如创建监控项 ，name 和key是必须的。</li>
+<li>id  1  绑定json请求和响应</li>
+<li>auth  认证令牌  </li>
+</ol>
+<h2 id="API_使用">API 使用</h2>
+<p>登录</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H <span class="symbol">'Content</span>-Type:application/json' -d'{<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"user.authenticate"</span>,<span class="string">"params"</span>:{<span class="string">"user"</span>:<span class="string">"duobao"</span>,<span class="string">"password"</span>:<span class="string">"zabbix"</span>},<span class="string">"auth"</span>: <span class="keyword">null</span>,<span class="string">"id"</span>:<span class="number">0</span>}' http:<span class="comment">//zabbix.wacai.info/api_jsonrpc.php</span></div></pre></td></tr></table></figure>
+
+<p>获取主机</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H <span class="string">'Content-Type: application/json'</span> -d <span class="string">'{"</span>jsonrpc<span class="string">":"</span><span class="number">2.0</span><span class="string">","</span>method<span class="string">":"</span><span class="transposed_variable">host.</span>get<span class="string">","</span>params<span class="string">":{"</span>output<span class="string">":["</span>hostid<span class="string">","</span>name<span class="string">"],"</span>filter<span class="string">":{"</span>host<span class="string">":"</span><span class="string">"}},"</span>auth<span class="string">":"</span>ecc543db662930c122b5fbedee60cc63<span class="string">","</span>id<span class="string">":1}'</span> http:<span class="comment">//monitor.example.com/api_jsonrpc.php</span></div></pre></td></tr></table></figure>
+
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+
+  <nav id="pagination">
+  
+  
+  <div class="clearfix"></div>
+</nav>
+
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2015 <a href="/">hzchenkj</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="http://ajax.useso.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'hzchenkj' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -62,6 +62,318 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2015/11/02/zabbix-api/">
+  <time datetime="2015-11-02T07:57:40.000Z">
+    11月 2 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/11/02/zabbix-api/"></a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <h1 id="zabbix_api">zabbix api</h1>
+<h2 id="简介">简介</h2>
+<p>zabbix api 为批量操作，第三方软件集成及其他作用提供可编程接口。</p>
+<p>zabbix api 在1.8版本以后开始提供，zabbix移动客户端和原生的web前端部分都是建立在zabbix api上。zabbix api中间件使得架构更加模块化并避免对数据库进行操作。允许你使用JSON RPC协议来创建、更新和获取zabbix 对象并操作（认证你的账户）。</p>
+<p>zabbix api 提供两项功能：</p>
+<ol>
+<li>远程管理zabbix 配置</li>
+<li>远程检索配置和历史数据</li>
+</ol>
+<h2 id="使用JSON">使用JSON</h2>
+<p>采用JSON RPC协议实现。调用任何函数，都要发送POST请求，输入输出都是JSON格式。<br>工作方式如下：</p>
+<ol>
+<li>准备JSON对象，描述你想要做什么(创建主机，获取图像，更新监控项)</li>
+<li>采用POST方式 <a href="http://zabbix.wacai.info/zabbix/api_jsonrpc.php发送此JSON对象" target="_blank" rel="external">http://zabbix.wacai.info/zabbix/api_jsonrpc.php发送此JSON对象</a>. <a href="http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。" target="_blank" rel="external">http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。</a></li>
+<li>获取json响应格式</li>
+</ol>
+<blockquote>
+<p>请求方法必须是POST方法，HTTP Header  Content-Type  必须为【application/jsonrequest，application/json-rpc，application/json】其中之一</p>
+</blockquote>
+<h2 id="基本请求格式">基本请求格式</h2>
+<p>JSON 请求如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">{</div><div class="line">    "<span class="attribute">jsonrpc</span>": <span class="value"><span class="string">"2.0"</span></span>,</div><div class="line">    "<span class="attribute">method</span>": <span class="value"><span class="string">"method.name"</span></span>, </div><div class="line">    "<span class="attribute">params</span>": <span class="value">{</span></div><div class="line">        "<span class="attribute">param_1_name</span>": <span class="value"><span class="string">"param_1_value"</span></span>,</div><div class="line">        "<span class="attribute">param_2_name</span>": <span class="value"><span class="string">"param_2_value"</span> </span></div><div class="line">    },</div><div class="line">    "<span class="attribute">id</span>": <span class="value"><span class="number">1</span></span>,</div><div class="line">    "<span class="attribute">auth</span>": <span class="value"><span class="string">"159121b60d19a9b4b55d49e30cf12b81"</span></span>,</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<ol>
+<li>json rpc协议版本</li>
+<li>具体执行的操作 如:host.create item.update</li>
+<li>传递json对象来作为参数,如创建监控项 ，name 和key是必须的。</li>
+<li>id  1  绑定json请求和响应</li>
+<li>auth  认证令牌  </li>
+</ol>
+<h2 id="API_使用">API 使用</h2>
+<p>登录</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H <span class="symbol">'Content</span>-Type:application/json' -d'{<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"user.authenticate"</span>,<span class="string">"params"</span>:{<span class="string">"user"</span>:<span class="string">"duobao"</span>,<span class="string">"password"</span>:<span class="string">"zabbix"</span>},<span class="string">"auth"</span>: <span class="keyword">null</span>,<span class="string">"id"</span>:<span class="number">0</span>}' http:<span class="comment">//zabbix.wacai.info/api_jsonrpc.php</span></div></pre></td></tr></table></figure>
+
+<p>获取主机</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H <span class="string">'Content-Type: application/json'</span> -d <span class="string">'{"</span>jsonrpc<span class="string">":"</span><span class="number">2.0</span><span class="string">","</span>method<span class="string">":"</span><span class="transposed_variable">host.</span>get<span class="string">","</span>params<span class="string">":{"</span>output<span class="string">":["</span>hostid<span class="string">","</span>name<span class="string">"],"</span>filter<span class="string">":{"</span>host<span class="string">":"</span><span class="string">"}},"</span>auth<span class="string">":"</span>ecc543db662930c122b5fbedee60cc63<span class="string">","</span>id<span class="string">":1}'</span> http:<span class="comment">//monitor.example.com/api_jsonrpc.php</span></div></pre></td></tr></table></figure>
+
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2015/10/30/saltstack/">
+  <time datetime="2015-10-30T15:18:56.000Z">
+    10月 30 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/10/30/saltstack/"></a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <h1 id="SaltStack">SaltStack</h1>
+<p>saltstack</p>
+<h2 id="安装配置测试">安装配置测试</h2>
+<h3 id="salt-master">salt-master</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum <span class="operator"><span class="keyword">install</span> -y salt-<span class="keyword">master</span></span></div></pre></td></tr></table></figure>
+
+<p>修改配置文件 /etc/salt/master </p>
+<p>默认不用修改（KISS）</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#interface: 0.0.0.0</span></div></pre></td></tr></table></figure>
+
+<p>启动 </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">service</span> <span class="title">salt</span>-master restart</span></div></pre></td></tr></table></figure>
+
+<p>查看端口</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netstat -lntp|<span class="keyword">grep</span> <span class="number">4505</span></div></pre></td></tr></table></figure>
+
+<h3 id="salt-minion">salt-minion</h3>
+<p>安装</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum <span class="operator"><span class="keyword">install</span> -y salt-minion</span></div></pre></td></tr></table></figure>
+
+<p>配置</p>
+<p>/etc/salt/minion</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">master</span>: <span class="string">192.168.4.201</span></div></pre></td></tr></table></figure>
+
+<p>启动minion</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">service</span> <span class="title">salt</span>-minion start</span></div></pre></td></tr></table></figure>
+
+<p>查看端口</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netstnt -lntp|<span class="keyword">grep</span> <span class="number">4506</span></div></pre></td></tr></table></figure>
+
+<h3 id="salt_master_为salt_minion_授权">salt master 为salt minion 授权</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#salt-key -L </span></div><div class="line">salt-key <span class="operator">-a</span> test.wacai.com</div></pre></td></tr></table></figure>
+
+<p>测试</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">salt <span class="keyword">test</span>.wacai.com <span class="keyword">test</span>.ping</div></pre></td></tr></table></figure>
+
+<p>防火墙 master</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="literal">-</span><span class="comment">A</span> <span class="comment">INPUT</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">state</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">state</span> <span class="comment">new</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="comment">p</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">dport</span> <span class="comment">4505</span> <span class="literal">-</span><span class="comment">j</span> <span class="comment">ACCEPT</span></div><div class="line"><span class="literal">-</span><span class="comment">A</span> <span class="comment">INPUT</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">state</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">state</span> <span class="comment">new</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="comment">p</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">dport</span> <span class="comment">4506</span> <span class="literal">-</span><span class="comment">j</span> <span class="comment">ACCEPT</span></div></pre></td></tr></table></figure>
+
+
+
+
+<h2 id="规范">规范</h2>
+<p>主机名</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">app</span>&gt;</span>-<span class="tag">&lt;<span class="title">001</span>&gt;</span>-<span class="tag">&lt;<span class="title">sjc|fd|inner</span>&gt;</span>-<span class="tag">&lt;<span class="title">11|12|201|204</span>&gt;</span>-<span class="tag">&lt;<span class="title">ip</span>&gt;</span>.wacai.com</div><div class="line"></div><div class="line">kvmguest-002-inner-2-32.wacai.com</div></pre></td></tr></table></figure>
+
+<p>/etc/hosts</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="input"><span class="prompt">127.0.0.1 localhost </span></span></div><div class="line">&lt;ip&gt; hostname</div></pre></td></tr></table></figure>
+
+<p>例子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">127.0</span>.<span class="number">0.1</span>   localhost localhost.localdomain localhost4 localhost4.localdomain4</div><div class="line"><span class="number">192.168</span>.<span class="number">2.32</span>  kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span>.wacai.<span class="keyword">com</span> kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span></div></pre></td></tr></table></figure>
+
+<h2 id="远程命令_remote_command">远程命令 remote command</h2>
+<p>minon</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="title">salt</span> <span class="string">'*'</span> test.ping</div><div class="line">salt <span class="string">'myminion'</span> sys.list_functions test</div><div class="line">salt <span class="string">'*'</span> sys.doc test.fib</div><div class="line">salt <span class="string">'*'</span> test.fib <span class="number">30</span></div><div class="line">salt <span class="string">'*'</span> sys.doc test</div><div class="line">salt <span class="string">'*'</span> sys.list_functions sys</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">sudo salt <span class="string">'*'</span> cmd.run_all <span class="string">'echo HELLO'</span></div><div class="line">sudo salt --<span class="keyword">out</span>=<span class="keyword">nested</span> <span class="string">'*'</span> cmd.run_all <span class="string">'echo HELLO'</span></div><div class="line">salt --<span class="keyword">out</span>=raw <span class="string">'*'</span> cmd.run_all <span class="string">'echo HELLO'</span></div><div class="line">salt --<span class="keyword">out</span>=json <span class="string">'*'</span> cmd.run_all <span class="string">'echo HELLO'</span></div><div class="line">--<span class="keyword">out</span>=yaml</div><div class="line">--<span class="keyword">out</span>=quiet</div></pre></td></tr></table></figure>
+
+<h3 id="Targeting_strings">Targeting strings</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">salt <span class="string">'*'</span> test.ping</div><div class="line"><span class="built_in">sudo</span> salt <span class="string">'myminion'</span> test.ping</div><div class="line"><span class="built_in">sudo</span> salt <span class="string">'my*'</span> test.ping</div><div class="line"><span class="built_in">sudo</span> salt <span class="string">'my*mini*'</span> test.ping</div><div class="line"><span class="built_in">sudo</span> salt <span class="string">'??minion'</span> test.ping</div><div class="line"><span class="built_in">sudo</span> salt <span class="string">'[a-m]yminion'</span> test.ping</div></pre></td></tr></table></figure>
+
+<h3 id="Perl-compatible_regular_expression_matching_PCRE">Perl-compatible regular expression matching PCRE</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">salt -<span class="keyword">E</span> <span class="string">'myminion'</span> test.ping</div><div class="line">salt -<span class="keyword">E</span> <span class="string">'my'</span> test.ping</div><div class="line">salt -<span class="keyword">E</span> <span class="string">'my.*n'</span> test.ping</div><div class="line">salt -<span class="keyword">E</span> <span class="string">'^myminion$'</span> test.ping</div><div class="line">salt -<span class="keyword">E</span> <span class="string">'((my)|(your))minion'</span> test.ping</div><div class="line">salt -<span class="keyword">E</span> <span class="string">'myminion(s)?'</span> test.ping</div><div class="line">salt -<span class="keyword">E</span> <span class="string">'(my)?minion'</span> test.ping</div></pre></td></tr></table></figure>
+
+<h3 id="List_matching">List matching</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="title">salt</span> -L <span class="string">'myminion'</span> test.ping</div><div class="line">salt -L <span class="string">'myminion,yourminion,theirminion'</span> test.ping</div></pre></td></tr></table></figure>
+
+<p>Grains<br>Grains represent static data describing a minion. </p>
+<p>Pillars<br>Pillar data is similar to grains except that it can be defined more dynamically and is<br>a secure store for data. </p>
+<h3 id="Grain_and_pillar_matching">Grain and pillar matching</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">item</span> os_family</div><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">item</span> os</div><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">item</span> osfinger</div><div class="line">salt <span class="comment">--grain 'os_family:RedHat' test.ping</span></div><div class="line">salt -G <span class="string">'os:Ubuntu'</span> test.ping</div><div class="line">salt -G <span class="string">'os:u*'</span> test.ping</div><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">items</span></div></pre></td></tr></table></figure>
+
+<p>设置变量</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">salt <span class="string">'*'</span> <span class="transposed_variable">grains.</span>setval foo bar</div><div class="line">salt <span class="string">'*'</span> <span class="transposed_variable">grains.</span>item foo</div><div class="line">salt <span class="string">'*'</span> <span class="transposed_variable">grains.</span>setval baz <span class="string">'["</span>larry<span class="string">", "</span>moe<span class="string">", "</span>curly<span class="string">"]'</span></div><div class="line">salt <span class="string">'*'</span> <span class="transposed_variable">grains.</span>delval baz</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"># cat /etc/salt/grains</div><div class="line">baz:</div><div class="line">-<span class="ruby"> larry</span></div><div class="line">-<span class="ruby"> moe</span></div><div class="line">-<span class="ruby"> curly</span></div><div class="line">foo: bar</div></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">salt <span class="string">'*.baz.com'</span> test.ping</div><div class="line">  </div><div class="line">salt -E <span class="string">'web-(prod|dev)'</span> test.ping</div><div class="line">  </div><div class="line">salt -L <span class="string">'web-jonh, dborac-ether'</span> test.ping</div><div class="line">  </div><div class="line"><span class="preprocessor"># By grains, target the RedHat and Debian systems</span></div><div class="line">salt -G <span class="string">'os:(RedHat|Debian)'</span> test.ping</div><div class="line">  </div><div class="line"><span class="preprocessor"># By Pillar data, target human resources</span></div><div class="line">salt -I <span class="string">'deparment:HR'</span> test.ping</div><div class="line">  </div><div class="line"><span class="preprocessor"># By IP/subnet, target the local network </span></div><div class="line">salt -S <span class="string">'192.16.0.0/24'</span> test.ping</div></pre></td></tr></table></figure>
+
+<h3 id="Compound_matching">Compound matching</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># By minion ID and grains</span></div><div class="line"><span class="title">salt</span> -C <span class="string">'web-* and G<span class="variable">@os</span>:Ubuntu'</span> test.ping</div><div class="line">  </div><div class="line"><span class="comment"># By grains and Pillar data</span></div><div class="line">salt -C <span class="string">'G<span class="variable">@cpuarch</span>:x86_64 and I<span class="variable">@office</span>:32D'</span> test.ping</div><div class="line"></div><div class="line">salt -C <span class="string">'*minion and G<span class="variable">@os</span>:Ubuntu and not L<span class="variable">@yourminion</span>,theirminion'</span></div><div class="line">test.ping</div><div class="line"></div><div class="line">salt -C <span class="string">'* and not G<span class="variable">@os_family</span>:RedHat'</span> test.ping</div><div class="line"></div><div class="line">salt -C <span class="string">'G<span class="variable">@os</span>:Ubuntu or G<span class="variable">@os</span>:Fedora'</span> test.ping</div></pre></td></tr></table></figure>
+
+
+
+<p>组合</p>
+<table>
+<thead>
+<tr>
+<th>Letter</th>
+<th>Match Type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G</td>
+<td>Grains glob</td>
+<td>G@os:Ubuntu</td>
+<td></td>
+</tr>
+<tr>
+<td>E</td>
+<td>PCRE minion ID</td>
+<td>E@web\d+.(dev\</td>
+<td>qa\</td>
+<td>prod).loc</td>
+<td></td>
+</tr>
+<tr>
+<td>P</td>
+<td>Grains PCRE</td>
+<td>P@os:(RedHat\</td>
+<td>Fedora\</td>
+<td>CentOS)</td>
+<td></td>
+</tr>
+<tr>
+<td>L</td>
+<td>List of minions</td>
+<td>L@minion1.example.com, minion3.domain.com</td>
+<td></td>
+</tr>
+<tr>
+<td>I</td>
+<td>Pillar glob</td>
+<td>I@pdata:foobar</td>
+<td></td>
+</tr>
+<tr>
+<td>S</td>
+<td>Subnet/IP address</td>
+<td>S@192.168.1.0/24 or S@192.168.1.100</td>
+<td></td>
+</tr>
+<tr>
+<td>R</td>
+<td>Range cluster</td>
+<td>R@%foo.bar</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="Remote_execution_modules_and_functions">Remote execution modules and functions</h2>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;<span class="class"><span class="keyword">module</span>&gt;.<span class="inheritance">&lt;<span class="parent">function</span></span>&gt;</span></div><div class="line">test.ping</div></pre></td></tr></table></figure>
+
+
+
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="title">salt</span> <span class="string">'*'</span> sys.list_modules</div></pre></td></tr></table></figure>
+
+
+
+<p> 常用模块</p>
+<h3 id="用户管理">用户管理</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">salt '<span class="keyword">*</span>' sys.doc user.add</div><div class="line">salt '<span class="keyword">*</span>' user.add name <span class="variable">&lt;uid&gt;</span> <span class="variable">&lt;gid&gt;</span> <span class="variable">&lt;groups&gt;</span> <span class="variable">&lt;home&gt;</span> <span class="variable">&lt;shell&gt;</span></div><div class="line">salt '<span class="keyword">*</span>' user.add larry</div><div class="line">salt '<span class="keyword">*</span>' user.info larry</div></pre></td></tr></table></figure>
+
+
+<h3 id="安装包">安装包</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">salt <span class="string">'*'</span> sys.doc pkg.install</div><div class="line">salt <span class="string">'*'</span> pkg.install httpd</div><div class="line">salt <span class="string">'*'</span> pkg.<span class="keyword">version</span> nano</div><div class="line">salt <span class="string">'*'</span> pkg.list_pkgs --out=json</div><div class="line">salt <span class="string">'*'</span> pkg.<span class="built_in">remove</span> htop</div></pre></td></tr></table></figure>
+
+<h3 id="管理服务">管理服务</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">salt <span class="string">'*'</span> service.status httpd</div><div class="line">salt <span class="string">'*'</span> service.<span class="keyword">stop</span> apache2</div></pre></td></tr></table></figure>
+
+<h3 id="监控minion状态">监控minion状态</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="title">salt</span> <span class="string">'*'</span> status.diskusage</div><div class="line">salt <span class="string">'*'</span> status.loadavg</div><div class="line">salt <span class="string">'*'</span> status.meminfo</div><div class="line">salt <span class="string">'*'</span> status.uptime</div></pre></td></tr></table></figure>
+
+<h3 id="运行命令">运行命令</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">salt <span class="string">'*'</span> cmd.run <span class="string">'echo Hello!'</span></div><div class="line">salt <span class="string">'*'</span> cmd.run_stderr <span class="string">'echo Hello!'</span></div><div class="line">salt <span class="string">'*'</span> cmd.retcode <span class="string">'echo Hello!'</span></div><div class="line">salt <span class="string">'*'</span> cmd.run_all <span class="string">'echo Hello!'</span></div><div class="line">cmd.script <span class="keyword">sh</span>脚本</div></pre></td></tr></table></figure>
+
+
+<h2 id="state">state</h2>
+<p>对基础服务的管理包括配置管理系统、用户账号管理、yum配置管理、hosts文件管理、时间同步管理、DNS配置管理。</p>
+<h3 id="配置管理系统">配置管理系统</h3>
+<p>配置管理系统使用模块化设计，</p>
+<p>每个服务一个模块，<br>将多个模块组织到一起形成角色（/srv/salt/roles/）。</p>
+<p>所有模块放置到：/srv/salt下，<br>入口配置文件为：/srv/salt/top.sls。</p>
+<p>模块使用的变量放置到：/srv/pillar，<br>入口配置文件：/srv/pillar/top.sls。</p>
+<p>针对变量的作用域不同，将变量分为三级：</p>
+<p>一级应用于模块（/srv/pillar/模块名），</p>
+<p>一级应用于角色（/srv/pillar/roles/），</p>
+<p>一级应用于主机节点（/srv/pillar/nodes）。</p>
+<p>入口配置/srv/salt/top.sls，直接引用各种角色：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">base:  </div><div class="line">  '*':  </div><div class="line">    -<span class="ruby"> roles.common  </span></div><div class="line">  'admin.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.admin  </span></div><div class="line">  'ha.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.ha  </span></div><div class="line">  'web*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.web  </span></div><div class="line">  'cache*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.cache  </span></div><div class="line">  'mc*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.mc  </span></div><div class="line">  'db*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.db  </span></div><div class="line">  'search*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.search  </span></div><div class="line">  'storage*'.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.storage</span></div></pre></td></tr></table></figure>
+
+<p>变量入口配置文件/srv/pillar/top.sls：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">base:  </div><div class="line">  '*':  </div><div class="line">    -<span class="ruby"> roles.common  </span></div><div class="line">  # 引用角色级变量  </div><div class="line">  # 模块级变量在角色级变量中引用  </div><div class="line">  'admin.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.admin  </span></div><div class="line">  'ha.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.ha  </span></div><div class="line">  'web*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.web  </span></div><div class="line">  'cache*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.cache  </span></div><div class="line">  'mc*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.mc  </span></div><div class="line">  'db*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.db  </span></div><div class="line">  'search*.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.search  </span></div><div class="line">  'storage*'.grid.mall.com':  </div><div class="line">    -<span class="ruby"> roles.storage  </span></div><div class="line">  # 引用节点级变量</div><div class="line">  'ha1.grid.mall.com':  </div><div class="line">    -<span class="ruby"> nodes.ha1  </span></div><div class="line">  'ha2.grid.mall.com':</div><div class="line">    -<span class="ruby"> nodes.ha2  </span></div><div class="line">  'mc1.grid.mall.com':</div><div class="line">    -<span class="ruby"> nodes.mc1  </span></div><div class="line">  'mc2.grid.mall.com':</div><div class="line">    -<span class="ruby"> nodes.mc2  </span></div><div class="line">  'db1.grid.mall.com':</div><div class="line">    -<span class="ruby"> nodes.db1  </span></div><div class="line">  'db2.grid.mall.com':</div><div class="line">    -<span class="ruby"> nodes.db2</span></div></pre></td></tr></table></figure>
+
+<p>用户账号管理<br>用户管理模块：/srv/salt/users</p>
+<p>pillar和grains都可以用来获取变量</p>
+<p>grains偏向于获取客户端相关信息，比如客户端硬件架构、cpu核数、操作系统版本等信息，相当于puppet的facter；</p>
+<p>pillar用于定义用户变量，通过pillar变量的传递，使salt state模块易于重用，相当于puppet的hiera。</p>
+<p>使用pillar变量之前需要执行salt ‘*’ saltutil.refresh_pillar命令使变量生效。</p>
+<p>使用命令salt ‘admin.grid.mall.com’ pillar.item users获取users变量：</p>
+<p>/srv/salt/users/user.sls用于管理用户</p>
+<h3 id="Saltstack：服务部署">Saltstack：服务部署</h3>
+<h2 id="API_(http_restful)">API (http restful)</h2>
+<h3 id="salt_—versions-report">salt —versions-report</h3>
+<h3 id="Specify_an_sls_file">Specify an sls file</h3>
+<p>We can also specify an sls file. Sls files don’t normally use execution modules, and instead use state modules that are called automagically by Salt when it processes the state, although there is a special state module to call execution modules from within sls files. More on writing states in a minute:</p>
+<h1 id="Apply_the_states_from_the_ssh-sls_file_on_all_minions-">Apply the states from the ssh.sls file on all minions.</h1>
+<h1 id="Notice_how_we_omit_the_-sls_extension_in_the_command_line-">Notice how we omit the .sls extension in the command line.</h1>
+<p>  salt ‘*’ state.sls ssh</p>
+<p>salt -N ‘logs_wpk’   state.highstate<br>salt kvmguest-001-sjc-13-33.wacai.com  state.highstate<br>salt kvmguest-001-sjc-13-33.wacai.com  state.sls base.zabbix</p>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2015/09/29/linux_bonding_xen_kvm/">
   <time datetime="2015-09-29T03:21:18.000Z">
     9月 29 2015
