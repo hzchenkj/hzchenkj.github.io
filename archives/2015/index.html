@@ -62,71 +62,65 @@
   <header>
     
       <div class="icon"></div>
-      <a href="/2015/11/02/zabbix-api/">
-  <time datetime="2015-11-02T14:17:07.000Z">
-    11月 2 2015
+      <a href="/2015/12/07/linux_bonding_xen_kvm/">
+  <time datetime="2015-12-07T13:06:16.000Z">
+    12月 7 2015
   </time>
 </a>
     
     
   
-    <h1 class="title"><a href="/2015/11/02/zabbix-api/"></a></h1>
+    <h1 class="title"><a href="/2015/12/07/linux_bonding_xen_kvm/"></a></h1>
   
 
   </header>
   
   <div class="entry">
     
-      <h1 id="zabbix_api">zabbix api</h1>
-<h2 id="简介">简介</h2>
-<p>zabbix api 为批量操作，第三方软件集成及其他作用提供可编程接口。</p>
-<p>zabbix api 在1.8版本以后开始提供，zabbix移动客户端和原生的web前端部分都是建立在zabbix api上。zabbix api中间件使得架构更加模块化并避免对数据库进行操作。允许你使用JSON RPC协议来创建、更新和获取zabbix 对象并操作（认证你的账户）。</p>
-<p>zabbix api 提供两项功能：</p>
-<ol>
-<li>远程管理zabbix 配置</li>
-<li>远程检索配置和历史数据</li>
-</ol>
-<h2 id="zabbix_API开发库">zabbix API开发库</h2>
-<p>zabbix API请求和响应都是json，并且还提供了各种语法的lib库，<a href="http://zabbix.org/wiki/Docs/api/libraries" target="_blank" rel="external">http://zabbix.org/wiki/Docs/api/libraries</a>，包含php、c#、Python、Perl、go等等语言</p>
-<h2 id="使用JSON">使用JSON</h2>
-<p>采用JSON RPC协议实现。调用任何函数，都要发送POST请求，输入输出都是JSON格式。<br>工作方式如下：</p>
-<ol>
-<li>准备JSON对象，描述你想要做什么(创建主机，获取图像，更新监控项)</li>
-<li>采用POST方式 <a href="http://zabbix.wacai.info/zabbix/api_jsonrpc.php发送此JSON对象" target="_blank" rel="external">http://zabbix.wacai.info/zabbix/api_jsonrpc.php发送此JSON对象</a>. <a href="http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。" target="_blank" rel="external">http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。</a></li>
-<li>获取json响应格式</li>
-</ol>
-<blockquote>
-<p>请求方法必须是POST方法，HTTP Header  Content-Type  必须为【application/jsonrequest，application/json-rpc，application/json】其中之一</p>
-</blockquote>
-<h2 id="基本请求格式">基本请求格式</h2>
-<p>JSON 请求如下：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">{</div><div class="line">    "<span class="attribute">jsonrpc</span>": <span class="value"><span class="string">"2.0"</span></span>,</div><div class="line">    "<span class="attribute">method</span>": <span class="value"><span class="string">"method.name"</span></span>, </div><div class="line">    "<span class="attribute">params</span>": <span class="value">{</span></div><div class="line">        "<span class="attribute">param_1_name</span>": <span class="value"><span class="string">"param_1_value"</span></span>,</div><div class="line">        "<span class="attribute">param_2_name</span>": <span class="value"><span class="string">"param_2_value"</span> </span></div><div class="line">    },</div><div class="line">    "<span class="attribute">id</span>": <span class="value"><span class="number">1</span></span>,</div><div class="line">    "<span class="attribute">auth</span>": <span class="value"><span class="string">"159121b60d19a9b4b55d49e30cf12b81"</span></span>,</div><div class="line">}</div></pre></td></tr></table></figure>
+      <h1 id="Linux_双网卡绑定bonding">Linux 双网卡绑定bonding</h1>
+<p>环境：</p>
+<h2 id="CentOS_5系列_+_Xen">CentOS 5系列 + Xen</h2>
+<h3 id="1_双网卡绑定_，产生bond0_接口">1 双网卡绑定 ，产生bond0 接口</h3>
+<p>脚本如下:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="xml">cp /etc/sysconfig/network-scripts/ifcfg-eth1 /etc/sysconfig/network-scripts/ifcfg-eth1.bak </span></div><div class="line">cat &gt; /etc/sysconfig/network-scripts/ifcfg-eth1 <span class="tag">&lt;&lt;<span class="attribute">EOF</span> </span></div><div class="line"><span class="attribute">DEVICE</span>=<span class="value">eth1</span> </div><div class="line"><span class="attribute">USERCTL</span>=<span class="value">no</span> </div><div class="line"><span class="attribute">BOOTPROTO</span>=<span class="value">none</span> </div><div class="line"><span class="attribute">ONBOOT</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">MASTER</span>=<span class="value">bond0</span> </div><div class="line"><span class="attribute">SLAVE</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">TYPE</span>=<span class="value">Ethernet</span></div><div class="line"></div><div class="line"><span class="attribute">EOF</span></div><div class="line"></div><div class="line"><span class="attribute">cp</span> /<span class="attribute">etc</span>/<span class="attribute">sysconfig</span>/<span class="attribute">network-scripts</span>/<span class="attribute">ifcfg-eth2</span> /<span class="attribute">etc</span>/<span class="attribute">sysconfig</span>/<span class="attribute">network-scripts</span>/<span class="attribute">ifcfg-eth2.bak</span> </div><div class="line"><span class="attribute">cat</span> &gt; /etc/sysconfig/network-scripts/ifcfg-eth2 <span class="tag">&lt;&lt;<span class="attribute">EOF</span> </span></div><div class="line"><span class="attribute">DEVICE</span>=<span class="value">eth2</span> </div><div class="line"><span class="attribute">USERCTL</span>=<span class="value">no</span> </div><div class="line"><span class="attribute">BOOTPROTO</span>=<span class="value">none</span> </div><div class="line"><span class="attribute">ONBOOT</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">MASTER</span>=<span class="value">bond0</span> </div><div class="line"><span class="attribute">SLAVE</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">TYPE</span>=<span class="value">Ethernet</span></div><div class="line"></div><div class="line"><span class="attribute">EOF</span></div><div class="line"></div><div class="line"><span class="attribute">cat</span> &gt;/etc/sysconfig/network-scripts/ifcfg-bond0 <span class="tag">&lt;&lt; <span class="attribute">EOF</span> </span></div><div class="line"><span class="attribute">DEVICE</span>=<span class="value">bond0</span> </div><div class="line"><span class="attribute">BOOTPROTO</span>=<span class="value">none</span> </div><div class="line"><span class="attribute">IPADDR</span>=<span class="value">192.168.10.xx</span> </div><div class="line"><span class="attribute">NETMASK</span>=<span class="value">255.255.255.0</span> </div><div class="line"><span class="attribute">NETWORK</span>=<span class="value">192.168.10.254</span> </div><div class="line"><span class="attribute">USERCTL</span>=<span class="value">no</span> </div><div class="line"><span class="attribute">ONBOOT</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">TYPE</span>=<span class="value">Ethernet</span></div><div class="line"></div><div class="line"><span class="attribute">EOF</span></div></pre></td></tr></table></figure>
 
-<ol>
-<li>json rpc协议版本</li>
-<li>具体执行的操作 如:host.create item.update</li>
-<li>传递json对象来作为参数,如创建监控项 ，name 和key是必须的。</li>
-<li>id  1  绑定json请求和响应</li>
-<li>auth  认证令牌  </li>
-</ol>
-<h2 id="API_使用">API 使用</h2>
-<p>1 登录</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>:<span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"user.login"</span>,<span class="string">"params"</span>:{<span class="string">"user"</span>:<span class="string">"***"</span>,<span class="string">"password"</span>:<span class="string">"***"</span>},<span class="string">"auth"</span>:null,<span class="string">"id"</span>:0}' http://zabbix.<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>.info/api_jsonrpc.php</div></pre></td></tr></table></figure>
+<h3 id="2_修改xen配置文件">2 修改xen配置文件</h3>
+<p>/etc/xen/xend-config.sxp</p>
+<p>(network-script ‘network-bridge netdev=bond0’)</p>
+<p>使xen使用bond0 接口,默认生成xenbr0 的接口<br>或者</p>
+<p>(network-script ‘network-bridge bridge=xenbr1 netdev=bond0’)</p>
+<p>指定桥接的接口</p>
+<p>原来的虚拟机是使用了多网卡 桥接的脚本<br>/etc/xen/xend-config.sxp</p>
+<p>(network-script multi_bridge)</p>
+<p>/etc/xen/scripts/multi_bridge</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="shebang">#!/bin/bash</span></div><div class="line">dir=$(dirname <span class="string">"<span class="variable">$0</span>"</span>)</div><div class="line"><span class="string">"<span class="variable">$dir</span>/network-bridge"</span> <span class="string">"<span class="variable">$@</span>"</span> vifnum=<span class="number">0</span> netdev=eth0 bridge=xenbr0</div><div class="line"><span class="string">"<span class="variable">$dir</span>/network-bridge"</span> <span class="string">"<span class="variable">$@</span>"</span> vifnum=<span class="number">1</span> netdev=eth1 bridge=xenbr1</div><div class="line"><span class="string">"<span class="variable">$dir</span>/network-bridge"</span> <span class="string">"<span class="variable">$@</span>"</span> vifnum=<span class="number">2</span> netdev=eth2 bridge=xenbr2</div><div class="line"><span class="string">"<span class="variable">$dir</span>/network-bridge"</span> <span class="string">"<span class="variable">$@</span>"</span> vifnum=<span class="number">3</span> netdev=eth3 bridge=xenbr3</div></pre></td></tr></table></figure>
 
-<p>2 获取主机</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>:<span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"host.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:[<span class="string">"hostid"</span>,<span class="string">"name"</span>],<span class="string">"filter"</span>:{<span class="string">"host"</span>:<span class="string">""</span>}},<span class="string">"auth"</span>:<span class="string">"22ad296ae1ac36a07d16ea91d7af7227"</span>,<span class="string">"id"</span>:1}' http://zabbix.<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>.info/api_jsonrpc.php</div></pre></td></tr></table></figure>
+<p>修改使用bond0</p>
+<p>sed -i ‘s/eth1/bond0/g’ /etc/xen/scripts/multi_bridge sed -i ‘5,6s/^/#/‘ /etc/xen/scripts/multi_bridge</p>
+<h3 id="3_domainU_配置文件">3 domainU 配置文件</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="variable">name =</span> <span class="string">"domain-1"</span></div><div class="line"><span class="variable">uuid =</span> <span class="string">"a5b43314-cd35-74e3-a357-4290768b7599"</span></div><div class="line"><span class="variable">maxmem =</span> <span class="number">8192</span></div><div class="line"><span class="variable">memory =</span> <span class="number">8192</span></div><div class="line"><span class="variable">vcpus =</span> <span class="number">6</span></div><div class="line"><span class="variable">bootloader =</span> <span class="string">"/usr/bin/pygrub"</span></div><div class="line"><span class="variable">on_poweroff =</span> <span class="string">"destroy"</span></div><div class="line"><span class="variable">on_reboot =</span> <span class="string">"restart"</span></div><div class="line"><span class="variable">on_crash =</span> <span class="string">"restart"</span></div><div class="line"><span class="variable">vfb =</span> [ <span class="string">"type=vnc,vncunused=1,keymap=en-us"</span>  ]</div><div class="line"><span class="variable">disk =</span> [ <span class="string">"tap:aio:/data/xenserver/domain-1/domain-1.img,xvda,w"</span>  ]</div><div class="line"><span class="variable">vif =</span> [ <span class="string">"mac=00:16:3e:37:02:c7,bridge=xenbr0,script=vif-bridge"</span>, <span class="string">"mac=00:16:36:18:22:f1,bridge=xenbr1,script=vif-bridge"</span>  ]</div></pre></td></tr></table></figure>
 
-<p>3 获取监控主机的hostids</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"host.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:[<span class="string">"hostid"</span>],<span class="string">"filter"</span>: {<span class="string">"host"</span>:<span class="string">"192.168.11.1"</span>}},<span class="string">"auth"</span>: <span class="string">"22ad296ae1ac36a07d16ea91d7af7227"</span>,<span class="string">"id"</span>: <span class="number">0</span>}' http:<span class="comment">//x.x.x.x/api_jsonrpc.php</span></div><div class="line">#<span class="string">"hostid"</span>:<span class="string">"10243"</span></div></pre></td></tr></table></figure>
+<h3 id="4_修改内核加载参数，使之生效">4 修改内核加载参数，使之生效</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cp</span> /etc/modprobe.<span class="keyword">conf</span> /etc/modprobe.<span class="keyword">conf</span>.bak </div><div class="line"><span class="keyword">cat</span> &gt;&gt; /etc/modprobe.<span class="keyword">conf</span> &lt;&lt; EOF</div><div class="line">alias bond0 bonding </div><div class="line"><span class="keyword">options</span> bond0 miimon=<span class="number">100</span> <span class="built_in">mode</span>=<span class="number">0</span></div><div class="line"></div><div class="line">EOF</div></pre></td></tr></table></figure>
 
-<p>（3）获得监控项itemids</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"item.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:<span class="string">"itemids"</span>,<span class="string">"hostids"</span>:<span class="string">"10243"</span>,<span class="string">"search"</span>:{<span class="string">"key_"</span>:<span class="string">"system.cpu.util</span></div><div class="line">[,idle,avg1]"}},<span class="string">"auth"</span>: <span class="string">"a826fca79a0795ccc1224dc76329972f"</span>,<span class="string">"id"</span>: <span class="number">0</span>}' http:<span class="comment">//x.x.x.x/api_jsonrpc.php</span></div><div class="line">#“item”:<span class="string">"24526"</span></div></pre></td></tr></table></figure>
+<p>xen方式需要重启机器，才能保证双网卡绑定正常<br>加载绑定模块<br>modprobe bonding</p>
+<p>xen 在重启完后，会生成一个pbond0 的接口</p>
+<p>cat /proc/net/bonding/pbond0</p>
+<h2 id="CentOS_6系列_+_KVM">CentOS 6系列 + KVM</h2>
+<h3 id="ifcfg-bond0">ifcfg-bond0</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="setting">DEVICE=<span class="value">bond0</span></span></div><div class="line"><span class="setting">BOOTPROTO=<span class="value">static</span></span></div><div class="line"><span class="setting">BRIDGE=<span class="value">br0</span></span></div><div class="line"><span class="setting">NM_CONTROLLED=<span class="value"><span class="keyword">no</span></span></span></div><div class="line"><span class="setting">ONBOOT=<span class="value"><span class="keyword">yes</span></span></span></div></pre></td></tr></table></figure>
 
-<p>(4)获取监控项”system.cpu.util[,idle,avg1] “在2014.2.19 14:00~14:20的值</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H <span class="string">'Content-Type: application/json'</span> -d <span class="string">'{"</span>jsonrpc<span class="string">": "</span><span class="number">2.0</span><span class="string">","</span>method<span class="string">":"</span><span class="transposed_variable">history.</span>get<span class="string">","</span>params<span class="string">":{"</span>history<span class="string">":0,"</span>itemids<span class="string">":["</span><span class="number">24526</span><span class="string">"],"</span>time_from<span class="string">":"</span><span class="number">1392789600</span><span class="string">","</span>time_till<span class="string">":"</span><span class="number">1392790200</span><span class="string">","</span>output<span class="string">":"</span>extend<span class="string">"},"</span>auth<span class="string">": "</span>a826fca79a0795ccc1224dc76329972f<span class="string">","</span>id<span class="string">": 0}'</span> http:<span class="comment">//x.x.x.x/api_jsonrpc.php</span></div></pre></td></tr></table></figure>
+<h3 id="ifcfg-br0">ifcfg-br0</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="setting">DEVICE=<span class="value">br0</span></span></div><div class="line"><span class="setting">TYPE=<span class="value">Bridge</span></span></div><div class="line"><span class="setting">BOOTPROTO=<span class="value">static</span></span></div><div class="line"><span class="setting">ONBOOT=<span class="value"><span class="keyword">yes</span></span></span></div><div class="line"><span class="setting">IPADDR=<span class="value"><span class="number">192.168</span>.<span class="number">11.110</span></span></span></div><div class="line"><span class="setting">NETMASK=<span class="value"><span class="number">255.255</span>.<span class="number">255.0</span></span></span></div><div class="line"><span class="setting">GATEWAY=<span class="value"><span class="number">192.168</span>.<span class="number">11.254</span></span></span></div><div class="line"><span class="setting">MTU=<span class="value"><span class="number">1500</span></span></span></div><div class="line"><span class="setting">SLAVE=<span class="value">bond0</span></span></div><div class="line"><span class="setting">NM_CONTROLLED=<span class="value"><span class="keyword">no</span></span></span></div><div class="line"><span class="setting">PEERDNS=<span class="value"><span class="keyword">no</span></span></span></div></pre></td></tr></table></figure>
 
-<h2 id="参考地址">参考地址</h2>
-<p><a href="https://www.zabbix.com/documentation/2.4/manual/api" target="_blank" rel="external">https://www.zabbix.com/documentation/2.4/manual/api</a> </p>
+<p>vi /etc/libvirt/qemu/domain-1.xml</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;interface <span class="class"><span class="keyword">type</span></span>=<span class="string">'bridge'</span>&gt;</div><div class="line">      &lt;mac address=<span class="string">'52:54:31:b3:73:31'</span>/&gt;</div><div class="line">      &lt;source bridge=<span class="string">'br0'</span>/&gt;</div><div class="line">      &lt;model <span class="class"><span class="keyword">type</span></span>=<span class="string">'virtio'</span>/&gt;</div><div class="line">      &lt;address <span class="class"><span class="keyword">type</span></span>=<span class="string">'pci'</span> domain=<span class="string">'0x0000'</span> bus=<span class="string">'0x00'</span> slot=<span class="string">'0x03'</span> <span class="keyword">function</span>=<span class="string">'0x0'</span>/&gt;</div><div class="line">&lt;/interface&gt;</div></pre></td></tr></table></figure>
+
+<h2 id="多个bonding">多个bonding</h2>
+<h3 id="修改内核模块">修改内核模块</h3>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cat</span> &gt;&gt; /etc/modprobe.<span class="keyword">conf</span> &lt;&lt; EOF</div><div class="line">alias bond0 bonding </div><div class="line"><span class="keyword">options</span> bond0 miimon=<span class="number">100</span> <span class="built_in">mode</span>=<span class="number">0</span></div><div class="line"></div><div class="line">alias bond1 bonding </div><div class="line"><span class="keyword">options</span> bond1 miimon=<span class="number">100</span> <span class="built_in">mode</span>=<span class="number">0</span></div><div class="line">EOF</div></pre></td></tr></table></figure>
+
+<p>modprobe bonding</p>
 
     
   </div>
@@ -145,15 +139,15 @@
   <header>
     
       <div class="icon"></div>
-      <a href="/2015/10/30/saltstack/">
-  <time datetime="2015-10-30T15:18:56.000Z">
-    10月 30 2015
+      <a href="/2015/12/07/saltstack/">
+  <time datetime="2015-12-07T13:05:40.000Z">
+    12月 7 2015
   </time>
 </a>
     
     
   
-    <h1 class="title"><a href="/2015/10/30/saltstack/"></a></h1>
+    <h1 class="title"><a href="/2015/12/07/saltstack/"></a></h1>
   
 
   </header>
@@ -191,10 +185,10 @@
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netstnt -lntp|<span class="keyword">grep</span> <span class="number">4506</span></div></pre></td></tr></table></figure>
 
 <h3 id="salt_master_为salt_minion_授权">salt master 为salt minion 授权</h3>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#salt-key -L </span></div><div class="line">salt-key <span class="operator">-a</span> test.wacai.com</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#salt-key -L </span></div><div class="line">salt-key <span class="operator">-a</span> test.*.com</div></pre></td></tr></table></figure>
 
 <p>测试</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">salt <span class="keyword">test</span>.wacai.com <span class="keyword">test</span>.ping</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">salt <span class="keyword">test</span>.*<span class="string">.com</span> <span class="keyword">test</span>.ping</div></pre></td></tr></table></figure>
 
 <p>防火墙 master</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="literal">-</span><span class="comment">A</span> <span class="comment">INPUT</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">state</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">state</span> <span class="comment">new</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="comment">p</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">dport</span> <span class="comment">4505</span> <span class="literal">-</span><span class="comment">j</span> <span class="comment">ACCEPT</span></div><div class="line"><span class="literal">-</span><span class="comment">A</span> <span class="comment">INPUT</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">state</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">state</span> <span class="comment">new</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="comment">p</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">dport</span> <span class="comment">4506</span> <span class="literal">-</span><span class="comment">j</span> <span class="comment">ACCEPT</span></div></pre></td></tr></table></figure>
@@ -204,13 +198,13 @@
 
 <h2 id="规范">规范</h2>
 <p>主机名</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">app</span>&gt;</span>-<span class="tag">&lt;<span class="title">001</span>&gt;</span>-<span class="tag">&lt;<span class="title">sjc|fd|inner</span>&gt;</span>-<span class="tag">&lt;<span class="title">11|12|201|204</span>&gt;</span>-<span class="tag">&lt;<span class="title">ip</span>&gt;</span>.wacai.com</div><div class="line"></div><div class="line">kvmguest-002-inner-2-32.wacai.com</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="variable">&lt;app&gt;</span>-<span class="variable">&lt;001&gt;</span>-<span class="variable">&lt;sjc|fd|inner&gt;</span>-<span class="variable">&lt;11|12|201|204&gt;</span>-<span class="variable">&lt;ip&gt;</span>.<span class="keyword">*</span>.com</div><div class="line"></div><div class="line">kvmguest-002-inner-2-32.<span class="keyword">*</span>.com</div><div class="line">kvmguest-inner-192-168-2-32.<span class="keyword">*</span>.com</div></pre></td></tr></table></figure>
 
 <p>/etc/hosts</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="input"><span class="prompt">127.0.0.1 localhost </span></span></div><div class="line">&lt;ip&gt; hostname</div></pre></td></tr></table></figure>
 
 <p>例子：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">127.0</span>.<span class="number">0.1</span>   localhost localhost.localdomain localhost4 localhost4.localdomain4</div><div class="line"><span class="number">192.168</span>.<span class="number">2.32</span>  kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span>.wacai.<span class="keyword">com</span> kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span></div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">127.0</span>.<span class="number">0.1</span>   localhost localhost.localdomain localhost4 localhost4.localdomain4</div><div class="line"><span class="number">192.168</span>.<span class="number">2.32</span>  kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span>.*.<span class="keyword">com</span> kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span></div></pre></td></tr></table></figure>
 
 <h2 id="远程命令_remote_command">远程命令 remote command</h2>
 <p>minon</p>
@@ -229,8 +223,7 @@
 <h3 id="List_matching">List matching</h3>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="title">salt</span> -L <span class="string">'myminion'</span> test.ping</div><div class="line">salt -L <span class="string">'myminion,yourminion,theirminion'</span> test.ping</div></pre></td></tr></table></figure>
 
-<p>Grains<br>Grains represent static data describing a minion. </p>
-<p>Pillars<br>Pillar data is similar to grains except that it can be defined more dynamically and is<br>a secure store for data. </p>
+<p>Grains<br>Grains represent static data describing a minion.<br>Pillars<br>Pillar data is similar to grains except that it can be defined more dynamically and is<br>a secure store for data. </p>
 <h3 id="Grain_and_pillar_matching">Grain and pillar matching</h3>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">item</span> os_family</div><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">item</span> os</div><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">item</span> osfinger</div><div class="line">salt <span class="comment">--grain 'os_family:RedHat' test.ping</span></div><div class="line">salt -G <span class="string">'os:Ubuntu'</span> test.ping</div><div class="line">salt -G <span class="string">'os:u*'</span> test.ping</div><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">items</span></div></pre></td></tr></table></figure>
 
@@ -368,7 +361,7 @@
 <h1 id="Apply_the_states_from_the_ssh-sls_file_on_all_minions-">Apply the states from the ssh.sls file on all minions.</h1>
 <h1 id="Notice_how_we_omit_the_-sls_extension_in_the_command_line-">Notice how we omit the .sls extension in the command line.</h1>
 <p>  salt ‘*’ state.sls ssh</p>
-<p>salt -N ‘logs_wpk’   state.highstate<br>salt kvmguest-001-sjc-13-33.wacai.com  state.highstate<br>salt kvmguest-001-sjc-13-33.wacai.com  state.sls base.zabbix</p>
+<p>salt -N ‘logs_wpk’   state.highstate<br>salt kvmguest-001-sjc-13-33.<em>.com  state.highstate<br>salt kvmguest-001-sjc-13-33.</em>.com  state.sls base.zabbix</p>
 
     
   </div>
@@ -387,65 +380,166 @@
   <header>
     
       <div class="icon"></div>
-      <a href="/2015/09/29/linux_bonding_xen_kvm/">
-  <time datetime="2015-09-29T03:21:18.000Z">
-    9月 29 2015
+      <a href="/2015/12/07/zabbix-api/">
+  <time datetime="2015-12-07T13:04:30.000Z">
+    12月 7 2015
   </time>
 </a>
     
     
   
-    <h1 class="title"><a href="/2015/09/29/linux_bonding_xen_kvm/"></a></h1>
+    <h1 class="title"><a href="/2015/12/07/zabbix-api/"></a></h1>
   
 
   </header>
   
   <div class="entry">
     
-      <h1 id="Linux_双网卡绑定bonding">Linux 双网卡绑定bonding</h1>
-<p>环境：</p>
-<h2 id="CentOS_5系列_+_Xen">CentOS 5系列 + Xen</h2>
-<h3 id="1_双网卡绑定_，产生bond0_接口">1 双网卡绑定 ，产生bond0 接口</h3>
-<p>脚本如下:</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="xml">cp /etc/sysconfig/network-scripts/ifcfg-eth1 /etc/sysconfig/network-scripts/ifcfg-eth1.bak </span></div><div class="line">cat &gt; /etc/sysconfig/network-scripts/ifcfg-eth1 <span class="tag">&lt;&lt;<span class="attribute">EOF</span> </span></div><div class="line"><span class="attribute">DEVICE</span>=<span class="value">eth1</span> </div><div class="line"><span class="attribute">USERCTL</span>=<span class="value">no</span> </div><div class="line"><span class="attribute">BOOTPROTO</span>=<span class="value">none</span> </div><div class="line"><span class="attribute">ONBOOT</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">MASTER</span>=<span class="value">bond0</span> </div><div class="line"><span class="attribute">SLAVE</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">TYPE</span>=<span class="value">Ethernet</span></div><div class="line"></div><div class="line"><span class="attribute">EOF</span></div><div class="line"></div><div class="line"><span class="attribute">cp</span> /<span class="attribute">etc</span>/<span class="attribute">sysconfig</span>/<span class="attribute">network-scripts</span>/<span class="attribute">ifcfg-eth2</span> /<span class="attribute">etc</span>/<span class="attribute">sysconfig</span>/<span class="attribute">network-scripts</span>/<span class="attribute">ifcfg-eth2.bak</span> </div><div class="line"><span class="attribute">cat</span> &gt; /etc/sysconfig/network-scripts/ifcfg-eth2 <span class="tag">&lt;&lt;<span class="attribute">EOF</span> </span></div><div class="line"><span class="attribute">DEVICE</span>=<span class="value">eth2</span> </div><div class="line"><span class="attribute">USERCTL</span>=<span class="value">no</span> </div><div class="line"><span class="attribute">BOOTPROTO</span>=<span class="value">none</span> </div><div class="line"><span class="attribute">ONBOOT</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">MASTER</span>=<span class="value">bond0</span> </div><div class="line"><span class="attribute">SLAVE</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">TYPE</span>=<span class="value">Ethernet</span></div><div class="line"></div><div class="line"><span class="attribute">EOF</span></div><div class="line"></div><div class="line"><span class="attribute">cat</span> &gt;/etc/sysconfig/network-scripts/ifcfg-bond0 <span class="tag">&lt;&lt; <span class="attribute">EOF</span> </span></div><div class="line"><span class="attribute">DEVICE</span>=<span class="value">bond0</span> </div><div class="line"><span class="attribute">BOOTPROTO</span>=<span class="value">none</span> </div><div class="line"><span class="attribute">IPADDR</span>=<span class="value">192.168.10.xx</span> </div><div class="line"><span class="attribute">NETMASK</span>=<span class="value">255.255.255.0</span> </div><div class="line"><span class="attribute">NETWORK</span>=<span class="value">192.168.10.254</span> </div><div class="line"><span class="attribute">USERCTL</span>=<span class="value">no</span> </div><div class="line"><span class="attribute">ONBOOT</span>=<span class="value">yes</span> </div><div class="line"><span class="attribute">TYPE</span>=<span class="value">Ethernet</span></div><div class="line"></div><div class="line"><span class="attribute">EOF</span></div></pre></td></tr></table></figure>
+      <h1 id="zabbix_api">zabbix api</h1>
+<h2 id="简介">简介</h2>
+<p>zabbix api 为批量操作，第三方软件集成及其他作用提供可编程接口。</p>
+<p>zabbix api 在1.8版本以后开始提供，zabbix移动客户端和原生的web前端部分都是建立在zabbix api上。zabbix api中间件使得架构更加模块化并避免对数据库进行操作。允许你使用JSON RPC协议来创建、更新和获取zabbix 对象并操作（认证你的账户）。</p>
+<p>zabbix api 提供两项功能：</p>
+<ol>
+<li>远程管理zabbix 配置</li>
+<li>远程检索配置和历史数据</li>
+</ol>
+<h2 id="zabbix_API开发库">zabbix API开发库</h2>
+<p>zabbix API请求和响应都是json，并且还提供了各种语法的lib库，<a href="http://zabbix.org/wiki/Docs/api/libraries" target="_blank" rel="external">http://zabbix.org/wiki/Docs/api/libraries</a>，包含php、c#、Python、Perl、go等等语言</p>
+<h2 id="使用JSON">使用JSON</h2>
+<p>采用JSON RPC协议实现。调用任何函数，都要发送POST请求，输入输出都是JSON格式。<br>工作方式如下：</p>
+<ol>
+<li>准备JSON对象，描述你想要做什么(创建主机，获取图像，更新监控项)</li>
+<li>采用POST方式 <a href="http://zabbix.*.info/zabbix/api_jsonrpc.php发送此JSON对象" target="_blank" rel="external">http://zabbix.*.info/zabbix/api_jsonrpc.php发送此JSON对象</a>. <a href="http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。" target="_blank" rel="external">http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。</a></li>
+<li>获取json响应格式</li>
+</ol>
+<blockquote>
+<p>请求方法必须是POST方法，HTTP Header  Content-Type  必须为【application/jsonrequest，application/json-rpc，application/json】其中之一</p>
+</blockquote>
+<h2 id="基本请求格式">基本请求格式</h2>
+<p>JSON 请求如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">{</div><div class="line">    "<span class="attribute">jsonrpc</span>": <span class="value"><span class="string">"2.0"</span></span>,</div><div class="line">    "<span class="attribute">method</span>": <span class="value"><span class="string">"method.name"</span></span>, </div><div class="line">    "<span class="attribute">params</span>": <span class="value">{</span></div><div class="line">        "<span class="attribute">param_1_name</span>": <span class="value"><span class="string">"param_1_value"</span></span>,</div><div class="line">        "<span class="attribute">param_2_name</span>": <span class="value"><span class="string">"param_2_value"</span> </span></div><div class="line">    },</div><div class="line">    "<span class="attribute">id</span>": <span class="value"><span class="number">1</span></span>,</div><div class="line">    "<span class="attribute">auth</span>": <span class="value"><span class="string">"159121b60d19a9b4b55d49e30cf12b81"</span></span>,</div><div class="line">}</div></pre></td></tr></table></figure>
 
-<h3 id="2_修改xen配置文件">2 修改xen配置文件</h3>
-<p>/etc/xen/xend-config.sxp</p>
-<p>(network-script ‘network-bridge netdev=bond0’)</p>
-<p>使xen使用bond0 接口,默认生成xenbr0 的接口<br>或者</p>
-<p>(network-script ‘network-bridge bridge=xenbr1 netdev=bond0’)</p>
-<p>指定桥接的接口</p>
-<p>原来的虚拟机是使用了多网卡 桥接的脚本<br>/etc/xen/xend-config.sxp</p>
-<p>(network-script multi_bridge)</p>
-<p>/etc/xen/scripts/multi_bridge</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="shebang">#!/bin/bash</span></div><div class="line">dir=$(dirname <span class="string">"<span class="variable">$0</span>"</span>)</div><div class="line"><span class="string">"<span class="variable">$dir</span>/network-bridge"</span> <span class="string">"<span class="variable">$@</span>"</span> vifnum=<span class="number">0</span> netdev=eth0 bridge=xenbr0</div><div class="line"><span class="string">"<span class="variable">$dir</span>/network-bridge"</span> <span class="string">"<span class="variable">$@</span>"</span> vifnum=<span class="number">1</span> netdev=eth1 bridge=xenbr1</div><div class="line"><span class="string">"<span class="variable">$dir</span>/network-bridge"</span> <span class="string">"<span class="variable">$@</span>"</span> vifnum=<span class="number">2</span> netdev=eth2 bridge=xenbr2</div><div class="line"><span class="string">"<span class="variable">$dir</span>/network-bridge"</span> <span class="string">"<span class="variable">$@</span>"</span> vifnum=<span class="number">3</span> netdev=eth3 bridge=xenbr3</div></pre></td></tr></table></figure>
+<ol>
+<li>json rpc协议版本</li>
+<li>具体执行的操作 如:host.create item.update</li>
+<li>传递json对象来作为参数,如创建监控项 ，name 和key是必须的。</li>
+<li>id  1  绑定json请求和响应</li>
+<li>auth  认证令牌  </li>
+</ol>
+<h2 id="API_使用">API 使用</h2>
+<p>1 登录</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>:<span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"user.login"</span>,<span class="string">"params"</span>:{<span class="string">"user"</span>:<span class="string">"***"</span>,<span class="string">"password"</span>:<span class="string">"***"</span>},<span class="string">"auth"</span>:null,<span class="string">"id"</span>:0}' http://zabbix.<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>.info/api_jsonrpc.php</div></pre></td></tr></table></figure>
 
-<p>修改使用bond0</p>
-<p>sed -i ‘s/eth1/bond0/g’ /etc/xen/scripts/multi_bridge sed -i ‘5,6s/^/#/‘ /etc/xen/scripts/multi_bridge</p>
-<h3 id="3_domainU_配置文件">3 domainU 配置文件</h3>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="variable">name =</span> <span class="string">"domain-1"</span></div><div class="line"><span class="variable">uuid =</span> <span class="string">"a5b43314-cd35-74e3-a357-4290768b7599"</span></div><div class="line"><span class="variable">maxmem =</span> <span class="number">8192</span></div><div class="line"><span class="variable">memory =</span> <span class="number">8192</span></div><div class="line"><span class="variable">vcpus =</span> <span class="number">6</span></div><div class="line"><span class="variable">bootloader =</span> <span class="string">"/usr/bin/pygrub"</span></div><div class="line"><span class="variable">on_poweroff =</span> <span class="string">"destroy"</span></div><div class="line"><span class="variable">on_reboot =</span> <span class="string">"restart"</span></div><div class="line"><span class="variable">on_crash =</span> <span class="string">"restart"</span></div><div class="line"><span class="variable">vfb =</span> [ <span class="string">"type=vnc,vncunused=1,keymap=en-us"</span>  ]</div><div class="line"><span class="variable">disk =</span> [ <span class="string">"tap:aio:/data/xenserver/domain-1/domain-1.img,xvda,w"</span>  ]</div><div class="line"><span class="variable">vif =</span> [ <span class="string">"mac=00:16:3e:37:02:c7,bridge=xenbr0,script=vif-bridge"</span>, <span class="string">"mac=00:16:36:18:22:f1,bridge=xenbr1,script=vif-bridge"</span>  ]</div></pre></td></tr></table></figure>
+<p>2 获取主机</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>:<span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"host.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:[<span class="string">"hostid"</span>,<span class="string">"name"</span>],<span class="string">"filter"</span>:{<span class="string">"host"</span>:<span class="string">""</span>}},<span class="string">"auth"</span>:<span class="string">"22ad296ae1ac36a07d16ea91d7af7227"</span>,<span class="string">"id"</span>:1}' http://zabbix.<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>.info/api_jsonrpc.php</div></pre></td></tr></table></figure>
 
-<h3 id="4_修改内核加载参数，使之生效">4 修改内核加载参数，使之生效</h3>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cp</span> /etc/modprobe.<span class="keyword">conf</span> /etc/modprobe.<span class="keyword">conf</span>.bak </div><div class="line"><span class="keyword">cat</span> &gt;&gt; /etc/modprobe.<span class="keyword">conf</span> &lt;&lt; EOF</div><div class="line">alias bond0 bonding </div><div class="line"><span class="keyword">options</span> bond0 miimon=<span class="number">100</span> <span class="built_in">mode</span>=<span class="number">0</span></div><div class="line"></div><div class="line">EOF</div></pre></td></tr></table></figure>
+<p>3 获取监控主机的hostids</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"host.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:[<span class="string">"hostid"</span>],<span class="string">"filter"</span>: {<span class="string">"host"</span>:<span class="string">"192.168.11.1"</span>}},<span class="string">"auth"</span>: <span class="string">"22ad296ae1ac36a07d16ea91d7af7227"</span>,<span class="string">"id"</span>: <span class="number">0</span>}' http:<span class="comment">//x.x.x.x/api_jsonrpc.php</span></div><div class="line">#<span class="string">"hostid"</span>:<span class="string">"10243"</span></div></pre></td></tr></table></figure>
 
-<p>xen方式需要重启机器，才能保证双网卡绑定正常<br>加载绑定模块<br>modprobe bonding</p>
-<p>xen 在重启完后，会生成一个pbond0 的接口</p>
-<p>cat /proc/net/bonding/pbond0</p>
-<h2 id="CentOS_6系列_+_KVM">CentOS 6系列 + KVM</h2>
-<h3 id="ifcfg-bond0">ifcfg-bond0</h3>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="setting">DEVICE=<span class="value">bond0</span></span></div><div class="line"><span class="setting">BOOTPROTO=<span class="value">static</span></span></div><div class="line"><span class="setting">BRIDGE=<span class="value">br0</span></span></div><div class="line"><span class="setting">NM_CONTROLLED=<span class="value"><span class="keyword">no</span></span></span></div><div class="line"><span class="setting">ONBOOT=<span class="value"><span class="keyword">yes</span></span></span></div></pre></td></tr></table></figure>
+<p>（3）获得监控项itemids</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H 'Content-Type: application/json' -d '{<span class="string">"jsonrpc"</span>: <span class="string">"2.0"</span>,<span class="string">"method"</span>:<span class="string">"item.get"</span>,<span class="string">"params"</span>:{<span class="string">"output"</span>:<span class="string">"itemids"</span>,<span class="string">"hostids"</span>:<span class="string">"10243"</span>,<span class="string">"search"</span>:{<span class="string">"key_"</span>:<span class="string">"system.cpu.util</span></div><div class="line">[,idle,avg1]"}},<span class="string">"auth"</span>: <span class="string">"a826fca79a0795ccc1224dc76329972f"</span>,<span class="string">"id"</span>: <span class="number">0</span>}' http:<span class="comment">//x.x.x.x/api_jsonrpc.php</span></div><div class="line">#“item”:<span class="string">"24526"</span></div></pre></td></tr></table></figure>
 
-<h3 id="ifcfg-br0">ifcfg-br0</h3>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="setting">DEVICE=<span class="value">br0</span></span></div><div class="line"><span class="setting">TYPE=<span class="value">Bridge</span></span></div><div class="line"><span class="setting">BOOTPROTO=<span class="value">static</span></span></div><div class="line"><span class="setting">ONBOOT=<span class="value"><span class="keyword">yes</span></span></span></div><div class="line"><span class="setting">IPADDR=<span class="value"><span class="number">192.168</span>.<span class="number">11.110</span></span></span></div><div class="line"><span class="setting">NETMASK=<span class="value"><span class="number">255.255</span>.<span class="number">255.0</span></span></span></div><div class="line"><span class="setting">GATEWAY=<span class="value"><span class="number">192.168</span>.<span class="number">11.254</span></span></span></div><div class="line"><span class="setting">MTU=<span class="value"><span class="number">1500</span></span></span></div><div class="line"><span class="setting">SLAVE=<span class="value">bond0</span></span></div><div class="line"><span class="setting">NM_CONTROLLED=<span class="value"><span class="keyword">no</span></span></span></div><div class="line"><span class="setting">PEERDNS=<span class="value"><span class="keyword">no</span></span></span></div></pre></td></tr></table></figure>
+<p>(4)获取监控项”system.cpu.util[,idle,avg1] “在2014.2.19 14:00~14:20的值</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -i -X POST -H <span class="string">'Content-Type: application/json'</span> -d <span class="string">'{"</span>jsonrpc<span class="string">": "</span><span class="number">2.0</span><span class="string">","</span>method<span class="string">":"</span><span class="transposed_variable">history.</span>get<span class="string">","</span>params<span class="string">":{"</span>history<span class="string">":0,"</span>itemids<span class="string">":["</span><span class="number">24526</span><span class="string">"],"</span>time_from<span class="string">":"</span><span class="number">1392789600</span><span class="string">","</span>time_till<span class="string">":"</span><span class="number">1392790200</span><span class="string">","</span>output<span class="string">":"</span>extend<span class="string">"},"</span>auth<span class="string">": "</span>a826fca79a0795ccc1224dc76329972f<span class="string">","</span>id<span class="string">": 0}'</span> http:<span class="comment">//x.x.x.x/api_jsonrpc.php</span></div></pre></td></tr></table></figure>
 
-<p>vi /etc/libvirt/qemu/domain-1.xml</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;interface <span class="class"><span class="keyword">type</span></span>=<span class="string">'bridge'</span>&gt;</div><div class="line">      &lt;mac address=<span class="string">'52:54:31:b3:73:31'</span>/&gt;</div><div class="line">      &lt;source bridge=<span class="string">'br0'</span>/&gt;</div><div class="line">      &lt;model <span class="class"><span class="keyword">type</span></span>=<span class="string">'virtio'</span>/&gt;</div><div class="line">      &lt;address <span class="class"><span class="keyword">type</span></span>=<span class="string">'pci'</span> domain=<span class="string">'0x0000'</span> bus=<span class="string">'0x00'</span> slot=<span class="string">'0x03'</span> <span class="keyword">function</span>=<span class="string">'0x0'</span>/&gt;</div><div class="line">&lt;/interface&gt;</div></pre></td></tr></table></figure>
+<h2 id="参考地址">参考地址</h2>
+<p><a href="https://www.zabbix.com/documentation/2.4/manual/api" target="_blank" rel="external">https://www.zabbix.com/documentation/2.4/manual/api</a> </p>
 
-<h2 id="多个bonding">多个bonding</h2>
-<h3 id="修改内核模块">修改内核模块</h3>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">cat</span> &gt;&gt; /etc/modprobe.<span class="keyword">conf</span> &lt;&lt; EOF</div><div class="line">alias bond0 bonding </div><div class="line"><span class="keyword">options</span> bond0 miimon=<span class="number">100</span> <span class="built_in">mode</span>=<span class="number">0</span></div><div class="line"></div><div class="line">alias bond1 bonding </div><div class="line"><span class="keyword">options</span> bond1 miimon=<span class="number">100</span> <span class="built_in">mode</span>=<span class="number">0</span></div><div class="line">EOF</div></pre></td></tr></table></figure>
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
 
-<p>modprobe bonding</p>
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2015/11/04/MegaCli_smart/">
+  <time datetime="2015-11-04T07:55:02.000Z">
+    11月 4 2015
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2015/11/04/MegaCli_smart/"></a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <h2 id="使用MegaCli工具查看Raid磁盘阵列状态">使用MegaCli工具查看Raid磁盘阵列状态</h2>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#MegaCli  -LDInfo -Lall -aALL 查raid级别</span></div><div class="line"><span class="preprocessor">#MegaCli -AdpAllInfo -aALL 查raid卡信息</span></div><div class="line"><span class="preprocessor">#MegaCli -AdpBbuCmd -aAll 查看电池信息</span></div><div class="line"><span class="preprocessor">#MegaCli -FwTermLog -Dsply -aALL 查看raid卡日志</span></div><div class="line"><span class="preprocessor">#MegaCli -adpCount 【显示适配器个数】</span></div><div class="line"><span class="preprocessor">#MegaCli -AdpGetTime –aALL 【显示适配器时间】</span></div><div class="line"><span class="preprocessor">#MegaCli -AdpAllInfo -aAll    【显示所有适配器信息】</span></div><div class="line"><span class="preprocessor">#MegaCli -LDInfo -LALL -aAll    【显示所有逻辑磁盘组信息】</span></div><div class="line"><span class="preprocessor">#MegaCli -PDList -aAll    【显示所有的物理信息】</span></div><div class="line"><span class="preprocessor">#MegaCli -AdpBbuCmd -GetBbuStatus -aALL |grep 'Charger Status' 【查看充电状态】</span></div><div class="line"><span class="preprocessor">#MegaCli -AdpBbuCmd -GetBbuStatus -aALL【显示BBU状态信息】</span></div><div class="line"><span class="preprocessor">#MegaCli -AdpBbuCmd -GetBbuCapacityInfo -aALL【显示BBU容量信息】</span></div><div class="line"><span class="preprocessor">#MegaCli -AdpBbuCmd -GetBbuDesignInfo -aALL    【显示BBU设计参数】</span></div><div class="line"><span class="preprocessor">#MegaCli -AdpBbuCmd -GetBbuProperties -aALL    【显示当前BBU属性】</span></div><div class="line"><span class="preprocessor">#MegaCli -cfgdsply -aALL    【显示Raid卡型号，Raid设置，Disk相关信息】</span></div></pre></td></tr></table></figure>
+
+<p>3.磁带状态的变化，从拔盘，到插盘的过程中。</p>
+<p>Device        |Normal|Damage|Rebuild|Normal</p>
+<p>Virtual Drive    |Optimal|Degraded|Degraded|Optimal</p>
+<p>Physical Drive    |Online|Failed –&gt; Unconfigured|Rebuild|Online</p>
+<p>4.查看磁盘缓存策略</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#MegaCli -LDGetProp -Cache -L0 -a0</span></div><div class="line"><span class="preprocessor">#MegaCli -LDGetProp -Cache -L1 -a0</span></div><div class="line"><span class="preprocessor">#MegaCli -LDGetProp -Cache -LALL -a0</span></div><div class="line"><span class="preprocessor">#MegaCli -LDGetProp -Cache -LALL -aALL</span></div><div class="line"><span class="preprocessor">#MegaCli -LDGetProp -DskCache -LALL -aALL</span></div></pre></td></tr></table></figure>
+
+<p>5.设置磁盘缓存策略<br>缓存策略解释：<br>WT    (Write through）</p>
+<p>WB    (Write back)</p>
+<p>NORA  (No read ahead)</p>
+<p>RA    (Read ahead)</p>
+<p>ADRA  (Adaptive read ahead)</p>
+<p>Cached</p>
+<p>Direct</p>
+<p>例子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#MegaCli -LDSetProp WT|WB|NORA|RA|ADRA -L0 -a0</span></div><div class="line">or</div><div class="line"><span class="preprocessor">#MegaCli -LDSetProp -Cached|-Direct -L0 -a0</span></div><div class="line">or</div><div class="line">enable / disable disk cache</div><div class="line"><span class="preprocessor">#MegaCli -LDSetProp -EnDskCache|-DisDskCache -L0 -a0</span></div></pre></td></tr></table></figure>
+
+<p>6.创建一个 raid5 阵列，由物理盘 2,3,4 构成，该阵列的热备盘是物理盘 5</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -CfgLdAdd -r5 [1:2,1:3,1:4] WB Direct -Hsp[1:5] -a0</span></div></pre></td></tr></table></figure>
+
+<p>7.创建阵列，不指定热备</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -CfgLdAdd -r5 [1:2,1:3,1:4] WB Direct -a0</span></div></pre></td></tr></table></figure>
+
+<p>8.删除阵列</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -CfgLdDel -L1 -a0</span></div></pre></td></tr></table></figure>
+
+<p>9.在线添加磁盘</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">#/opt/MegaCli -LDRecon -Start -<span class="literal">r5</span> -<span class="keyword">Add</span> -PhysDrv[<span class="number">1</span>:<span class="number">4</span>] -L1 -a0</div></pre></td></tr></table></figure>
+
+<p>10.阵列创建完后，会有一个初始化同步块的过程，可以看看其进度。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -LDInit -ShowProg -LALL -aALL</span></div></pre></td></tr></table></figure>
+
+<p>或者以动态可视化文字界面显示</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -LDInit -ProgDsply -LALL -aALL</span></div></pre></td></tr></table></figure>
+
+<p>11.查看阵列后台初始化进度</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -LDBI -ShowProg -LALL -aALL</span></div></pre></td></tr></table></figure>
+
+<p>或者以动态可视化文字界面显示</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -LDBI -ProgDsply -LALL -aALL</span></div></pre></td></tr></table></figure>
+
+<p>12.指定第 5 块盘作为全局热备</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -PDHSP -Set [-EnclAffinity] [-nonRevertible] -PhysDrv[1:5] -a0</span></div></pre></td></tr></table></figure>
+
+<p>13.指定为某个阵列的专用热备</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -PDHSP -Set [-Dedicated [-Array1]] [-EnclAffinity] [-nonRevertible] -PhysDrv[1:5] -a0</span></div></pre></td></tr></table></figure>
+
+<p>14.删除全局热备</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -PDHSP -Rmv -PhysDrv[1:5] -a0</span></div></pre></td></tr></table></figure>
+
+<p>15.将某块物理盘下线/上线</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -PDOffline -PhysDrv [1:4] -a0</span></div><div class="line"><span class="preprocessor">#/opt/MegaCli -PDOnline -PhysDrv [1:4] -a0</span></div></pre></td></tr></table></figure>
+
+<p>16.查看物理磁盘重建进度</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -PDRbld -ShowProg -PhysDrv [1:5] -a0</span></div></pre></td></tr></table></figure>
+
+<p>或者以动态可视化文字界面显示</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="preprocessor">#/opt/MegaCli -PDRbld -ProgDsply -PhysDrv [1:5] -a0</span></div></pre></td></tr></table></figure>
+
 
     
   </div>

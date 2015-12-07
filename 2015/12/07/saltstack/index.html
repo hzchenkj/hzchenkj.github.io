@@ -47,7 +47,7 @@ salt-master
 salt-mi">
 <meta property="og:type" content="article">
 <meta property="og:title" content="LinuxCoffee">
-<meta property="og:url" content="http://hzchenkj.github.com/2015/10/30/saltstack/">
+<meta property="og:url" content="http://hzchenkj.github.com/2015/12/07/saltstack/">
 <meta property="og:site_name" content="LinuxCoffee">
 <meta property="og:description" content="SaltStack
 saltstack
@@ -120,9 +120,9 @@ salt-mi">
   <header>
     
       <div class="icon"></div>
-      <a href="/2015/10/30/saltstack/">
-  <time datetime="2015-10-30T15:18:56.000Z">
-    10月 30 2015
+      <a href="/2015/12/07/saltstack/">
+  <time datetime="2015-12-07T13:05:40.000Z">
+    12月 7 2015
   </time>
 </a>
     
@@ -166,10 +166,10 @@ salt-mi">
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">netstnt -lntp|<span class="keyword">grep</span> <span class="number">4506</span></div></pre></td></tr></table></figure>
 
 <h3 id="salt_master_为salt_minion_授权">salt master 为salt minion 授权</h3>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#salt-key -L </span></div><div class="line">salt-key <span class="operator">-a</span> test.wacai.com</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#salt-key -L </span></div><div class="line">salt-key <span class="operator">-a</span> test.*.com</div></pre></td></tr></table></figure>
 
 <p>测试</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">salt <span class="keyword">test</span>.wacai.com <span class="keyword">test</span>.ping</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">salt <span class="keyword">test</span>.*<span class="string">.com</span> <span class="keyword">test</span>.ping</div></pre></td></tr></table></figure>
 
 <p>防火墙 master</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="literal">-</span><span class="comment">A</span> <span class="comment">INPUT</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">state</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">state</span> <span class="comment">new</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="comment">p</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">dport</span> <span class="comment">4505</span> <span class="literal">-</span><span class="comment">j</span> <span class="comment">ACCEPT</span></div><div class="line"><span class="literal">-</span><span class="comment">A</span> <span class="comment">INPUT</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">state</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">state</span> <span class="comment">new</span> <span class="literal">-</span><span class="comment">m</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="comment">p</span> <span class="comment">tcp</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">dport</span> <span class="comment">4506</span> <span class="literal">-</span><span class="comment">j</span> <span class="comment">ACCEPT</span></div></pre></td></tr></table></figure>
@@ -179,13 +179,13 @@ salt-mi">
 
 <h2 id="规范">规范</h2>
 <p>主机名</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="title">app</span>&gt;</span>-<span class="tag">&lt;<span class="title">001</span>&gt;</span>-<span class="tag">&lt;<span class="title">sjc|fd|inner</span>&gt;</span>-<span class="tag">&lt;<span class="title">11|12|201|204</span>&gt;</span>-<span class="tag">&lt;<span class="title">ip</span>&gt;</span>.wacai.com</div><div class="line"></div><div class="line">kvmguest-002-inner-2-32.wacai.com</div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="variable">&lt;app&gt;</span>-<span class="variable">&lt;001&gt;</span>-<span class="variable">&lt;sjc|fd|inner&gt;</span>-<span class="variable">&lt;11|12|201|204&gt;</span>-<span class="variable">&lt;ip&gt;</span>.<span class="keyword">*</span>.com</div><div class="line"></div><div class="line">kvmguest-002-inner-2-32.<span class="keyword">*</span>.com</div><div class="line">kvmguest-inner-192-168-2-32.<span class="keyword">*</span>.com</div></pre></td></tr></table></figure>
 
 <p>/etc/hosts</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="input"><span class="prompt">127.0.0.1 localhost </span></span></div><div class="line">&lt;ip&gt; hostname</div></pre></td></tr></table></figure>
 
 <p>例子：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">127.0</span>.<span class="number">0.1</span>   localhost localhost.localdomain localhost4 localhost4.localdomain4</div><div class="line"><span class="number">192.168</span>.<span class="number">2.32</span>  kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span>.wacai.<span class="keyword">com</span> kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span></div></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">127.0</span>.<span class="number">0.1</span>   localhost localhost.localdomain localhost4 localhost4.localdomain4</div><div class="line"><span class="number">192.168</span>.<span class="number">2.32</span>  kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span>.*.<span class="keyword">com</span> kvmguest-<span class="number">002</span>-inner-<span class="number">2</span>-<span class="number">32</span></div></pre></td></tr></table></figure>
 
 <h2 id="远程命令_remote_command">远程命令 remote command</h2>
 <p>minon</p>
@@ -204,8 +204,7 @@ salt-mi">
 <h3 id="List_matching">List matching</h3>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="title">salt</span> -L <span class="string">'myminion'</span> test.ping</div><div class="line">salt -L <span class="string">'myminion,yourminion,theirminion'</span> test.ping</div></pre></td></tr></table></figure>
 
-<p>Grains<br>Grains represent static data describing a minion. </p>
-<p>Pillars<br>Pillar data is similar to grains except that it can be defined more dynamically and is<br>a secure store for data. </p>
+<p>Grains<br>Grains represent static data describing a minion.<br>Pillars<br>Pillar data is similar to grains except that it can be defined more dynamically and is<br>a secure store for data. </p>
 <h3 id="Grain_and_pillar_matching">Grain and pillar matching</h3>
 <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">item</span> os_family</div><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">item</span> os</div><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">item</span> osfinger</div><div class="line">salt <span class="comment">--grain 'os_family:RedHat' test.ping</span></div><div class="line">salt -G <span class="string">'os:Ubuntu'</span> test.ping</div><div class="line">salt -G <span class="string">'os:u*'</span> test.ping</div><div class="line">salt <span class="string">'*'</span> grains.<span class="keyword">items</span></div></pre></td></tr></table></figure>
 
@@ -343,7 +342,7 @@ salt-mi">
 <h1 id="Apply_the_states_from_the_ssh-sls_file_on_all_minions-">Apply the states from the ssh.sls file on all minions.</h1>
 <h1 id="Notice_how_we_omit_the_-sls_extension_in_the_command_line-">Notice how we omit the .sls extension in the command line.</h1>
 <p>  salt ‘*’ state.sls ssh</p>
-<p>salt -N ‘logs_wpk’   state.highstate<br>salt kvmguest-001-sjc-13-33.wacai.com  state.highstate<br>salt kvmguest-001-sjc-13-33.wacai.com  state.sls base.zabbix</p>
+<p>salt -N ‘logs_wpk’   state.highstate<br>salt kvmguest-001-sjc-13-33.<em>.com  state.highstate<br>salt kvmguest-001-sjc-13-33.</em>.com  state.sls base.zabbix</p>
 
     
   </div>

@@ -23,7 +23,7 @@ zabbix api 在1.8版本以后开始提供，zabbix移动客户端和原生的web
 zabbi">
 <meta property="og:type" content="article">
 <meta property="og:title" content="LinuxCoffee">
-<meta property="og:url" content="http://hzchenkj.github.com/2015/11/02/zabbix-api/">
+<meta property="og:url" content="http://hzchenkj.github.com/2015/12/07/zabbix-api/">
 <meta property="og:site_name" content="LinuxCoffee">
 <meta property="og:description" content="zabbix api
 简介
@@ -72,9 +72,9 @@ zabbi">
   <header>
     
       <div class="icon"></div>
-      <a href="/2015/11/02/zabbix-api/">
-  <time datetime="2015-11-02T14:17:07.000Z">
-    11月 2 2015
+      <a href="/2015/12/07/zabbix-api/">
+  <time datetime="2015-12-07T13:04:30.000Z">
+    12月 7 2015
   </time>
 </a>
     
@@ -102,7 +102,7 @@ zabbi">
 <p>采用JSON RPC协议实现。调用任何函数，都要发送POST请求，输入输出都是JSON格式。<br>工作方式如下：</p>
 <ol>
 <li>准备JSON对象，描述你想要做什么(创建主机，获取图像，更新监控项)</li>
-<li>采用POST方式 <a href="http://zabbix.wacai.info/zabbix/api_jsonrpc.php发送此JSON对象" target="_blank" rel="external">http://zabbix.wacai.info/zabbix/api_jsonrpc.php发送此JSON对象</a>. <a href="http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。" target="_blank" rel="external">http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。</a></li>
+<li>采用POST方式 <a href="http://zabbix.*.info/zabbix/api_jsonrpc.php发送此JSON对象" target="_blank" rel="external">http://zabbix.*.info/zabbix/api_jsonrpc.php发送此JSON对象</a>. <a href="http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。" target="_blank" rel="external">http://example.com/zabbix/是Zabbix前端地址。api_jsonrpc.php是调用API的PHP脚本。可在安装可视化前端的目录下找到。</a></li>
 <li>获取json响应格式</li>
 </ol>
 <blockquote>
