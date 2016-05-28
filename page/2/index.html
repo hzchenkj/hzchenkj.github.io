@@ -60,6 +60,86 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2014/12/04/proxycommand/">
+  <time datetime="2014-12-04T10:38:49.000Z">
+    12月 4 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2014/12/04/proxycommand/">通过ProxyCommand 登录远程内网的服务器</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。<br>像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。<br>现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/config </div><div class="line"><span class="comment">#ControlMaster auto</span></div><div class="line"><span class="comment">#ControlPath /tmp/ssh_mux_%h_%p_%r</span></div><div class="line"><span class="comment">#ControlPersist 1h</span></div><div class="line"><span class="comment">#gateways</span></div><div class="line">Host  gateway</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        Hostname <span class="number">192.168</span>.<span class="number">16.230</span></div><div class="line"><span class="comment">#servers</span></div><div class="line">Host <span class="number">192.168</span>.<span class="number">22</span>.*</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        IdentityFile		   /path/to/ssh/key.pem</div><div class="line">        ProxyCommand ssh gateway nc %h %p</div></pre></td></tr></table></figure>
+
+
+<p>默认读取的时~/.ssh/config 这个文件，可以加上参数，指定不同的文件。<br>gateway 为堡垒机<br>然后192.168.22.* 类型的服务器ip都可以通过堡垒机登录。<br>先要先配置好ssh 互信，或指定key文件</p>
+<p>测试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ssh gateway -F ~/.ssh/config</div><div class="line">ssh <span class="number">192.168</span>.<span class="number">22.11</span> -F ~/.ssh/config.test </div><div class="line">ssh <span class="number">192.168</span>.<span class="number">22.11</span> -F ~/.ssh/config.test  -vvv 开启调试模式</div></pre></td></tr></table></figure>
+
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2014/12/03/Ansible-Playbooks/">
+  <time datetime="2014-12-03T08:20:12.000Z">
+    12月 3 2014
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2014/12/03/Ansible-Playbooks/">Ansible学习笔记&lt;二&gt; -Playbooks篇</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> _     _                   ____       __  __           </div><div class="line">| |   (_)_ __  _   ___  __/ ___|___  / _|/ _| ___  ___ </div><div class="line">| |   | | <span class="string">'_ \| | | \ \/ / |   / _ \| |_| |_ / _ \/ _ \</span></div><div class="line">| |___| | | | | |_| |&gt;  &lt;| |__| (_) |  _|  _|  __/  __/</div><div class="line">|_____|_|_| |_|\__,_/_/\_\\____\___/|_| |_|  \___|\___|</div></pre></td></tr></table></figure>
+
+<p>Ansible，官方的解释是：Ansible is the simplest way to automate IT.<br>Ansible 是通过 Python 语言开发。当前使用 Ansible 的用户有：Evernote、EA、rackspace、NASA、Atlassian、Twitter 等。<br>Ansible 默认通过 SSH 协议管理机器。在被控机器上不需要安装任何组件，需要的Python一般的Linux服务器都已经自带了。是一种比Puppet、SaltStack等更加轻量级的自动化运维管理工具。自带的模块也极其丰富。<br>Ansible 使用一个高质量的 Python 实现的 OpenSSH 协议库 “paramiko”。 Paramiko 遵循 SSH2 协议，支持以加密和认证的方式，进行远程服务器的连接。对 paramiko 进行了更高层次的封装。<a href="http://www.paramiko.org/" target="_blank" rel="external">http://www.paramiko.org/</a><br>Ansible 使用  YAML 文件格式并使用 Jinja2 模板语言。</p>
+<p>一些相关链接：<br>官方网站：<a href="http://www.ansible.com/index.html" target="_blank" rel="external">http://www.ansible.com</a><br>官方文档：<a href="http://docs.ansible.com/index.html" target="_blank" rel="external">http://docs.ansible.com/index.html</a></p>
+<h2 id="四、Ansible’s_playbooks">四、Ansible’s playbooks</h2>
+<p>playbooks 翻译过来就是剧本，我们只要写好剧本，就会按照剧本进行演出。只要定义好远程服务器需要达到某种状态，Ansible就会去处理。</p>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2014/12/02/Ansible-Base/">
   <time datetime="2014-12-02T05:26:51.000Z">
     12月 2 2014
@@ -670,7 +750,7 @@
   </div>
   <footer id="footer"><div class="copyright">
   
-  &copy; 2015 <a href="/">hzchenkj</a>
+  &copy; 2016 <a href="/">hzchenkj</a>
   
 </div>
 <div class="theme-copyright">

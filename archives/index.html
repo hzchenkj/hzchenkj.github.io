@@ -60,6 +60,96 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2016/05/28/logstsh-if-conf-d/">
+  <time datetime="2016-05-28T07:10:53.000Z">
+    5月 28 2016
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2016/05/28/logstsh-if-conf-d/"></a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>title: logstsh-if-conf.d<br>date: 2016-05-28 14:57:55</p>
+<h2 id="tags:logstash">tags:logstash</h2>
+<p>一般情况下，logstash 测试和运行环境存在区别的。<br>为了方便，logstash 测试的时候会使用如下命令：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/<span class="keyword">opt</span>/logstash/bin/logstash -<span class="keyword">f</span> /<span class="keyword">opt</span>/logstash/<span class="keyword">conf</span>.<span class="keyword">d</span>/test.<span class="keyword">conf</span></div></pre></td></tr></table></figure>
+
+<p>测试没有问题。然后就会使用如下方式:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">service</span> <span class="title">logstash</span> restart</span></div></pre></td></tr></table></figure>
+
+<p>让logstash  程序读取conf.d 目录下所有conf文件，然后启动程序。<br>这样就会带来一个问题，conf.d的文件 会被加载一个logstash 进程运行，多个conf 文件没有相互隔离。会出现测试时候不存在的问题。<br>解决方法：</p>
+<p>1 使用 测试方法，将多个conf文件分开运行，写到脚本中</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">/<span class="keyword">opt</span>/logstash/bin/logstash -<span class="keyword">f</span> /<span class="keyword">opt</span>/logstash/<span class="keyword">conf</span>.<span class="keyword">d</span>/test1.<span class="keyword">conf</span></div><div class="line">/<span class="keyword">opt</span>/logstash/bin/logstash -<span class="keyword">f</span> /<span class="keyword">opt</span>/logstash/<span class="keyword">conf</span>.<span class="keyword">d</span>/test2.<span class="keyword">conf</span></div></pre></td></tr></table></figure>
+
+<p>2 在配置文件中增加tag并做好if判断</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">input </div><div class="line">  file {</div><div class="line">     <span class="variable">type =</span>&gt; <span class="string">"app-log"</span></div><div class="line">     <span class="variable">path =</span>&gt; [ <span class="string">"/data/*.log"</span> ]</div><div class="line">     <span class="variable">start_position =</span>&gt; <span class="string">"beginning"</span></div><div class="line">     <span class="variable">codec =</span>&gt; multiline {</div><div class="line">       <span class="variable">pattern =</span>&gt; <span class="string">"^%{TIMESTAMP_ISO8601} "</span></div><div class="line">       <span class="variable">negate =</span>&gt; <span class="constant">true</span></div><div class="line">       <span class="variable">what =</span>&gt; previous</div><div class="line">     }</div><div class="line">   }</div><div class="line"></div><div class="line">   file {</div><div class="line">     <span class="variable">type =</span>&gt; <span class="string">"app-access-log"</span></div><div class="line">     <span class="variable">path =</span>&gt; [ <span class="string">"/data/*.log"</span> ]</div><div class="line">   } </div><div class="line">}</div><div class="line">   </div><div class="line">output {</div><div class="line">	<span class="keyword">if</span> ([type] <span class="keyword">in</span> [<span class="string">"app-log"</span>, <span class="string">"app-access-log"</span>]) {</div><div class="line">    </div><div class="line">   }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>logstash 在生产环境，一般是用service方式运行，或者使用supervisord来运行。 </p>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2016/05/28/es-immense-term/">
+  <time datetime="2016-05-28T06:41:08.000Z">
+    5月 28 2016
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2016/05/28/es-immense-term/">es-immense-term</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>es集群在运行过程中，收到告警说两个几点CPU load告警，上去看了日志发现如下错误：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">java.lang.IllegalArgumentException: Document <span class="operator">contains</span> <span class="keyword">at</span> least <span class="constant">one</span> immense term <span class="operator">in</span> field=<span class="string">"msg"</span> (whose UTF8 encoding is longer than <span class="operator">the</span> <span class="built_in">max</span> <span class="built_in">length</span> <span class="number">32766</span>), all <span class="operator">of</span> which were skipped.  Please correct <span class="operator">the</span> analyzer <span class="built_in">to</span> <span class="operator">not</span> produce such terms.  The prefix <span class="operator">of</span> <span class="operator">the</span> <span class="keyword">first</span> immense term is: <span class="string">'[123, 34, 98, 114, 111, 97, 100, 99, 97, 115, 116, 73, 100, 34, 58, 49, 52, 48, 56, 49, 57, 57, 57, 56, 56, 44, 34, 116, 121, 112]...'</span>, original message: <span class="keyword">bytes</span> can be <span class="keyword">at</span> most <span class="number">32766</span> <span class="operator">in</span> <span class="built_in">length</span>; got <span class="number">40283</span></div><div class="line">    <span class="keyword">at</span> org.apache.lucene.index.DefaultIndexingChain$PerField.invert(DefaultIndexingChain.java:<span class="number">685</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.lucene.index.DefaultIndexingChain.processField(DefaultIndexingChain.java:<span class="number">359</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.lucene.index.DefaultIndexingChain.processDocument(DefaultIndexingChain.java:<span class="number">318</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.lucene.index.DocumentsWriterPerThread.updateDocument(DocumentsWriterPerThread.java:<span class="number">239</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.lucene.index.DocumentsWriter.updateDocument(DocumentsWriter.java:<span class="number">454</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.lucene.index.IndexWriter.updateDocument(IndexWriter.java:<span class="number">1511</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.lucene.index.IndexWriter.addDocument(IndexWriter.java:<span class="number">1246</span>)</div><div class="line">    <span class="keyword">at</span> org.elasticsearch.index.engine.internal.InternalEngine.innerCreateNoLock(InternalEngine.java:<span class="number">482</span>)</div><div class="line">    <span class="keyword">at</span> org.elasticsearch.index.engine.internal.InternalEngine.innerCreate(InternalEngine.java:<span class="number">435</span>)</div><div class="line">    <span class="keyword">at</span> org.elasticsearch.index.engine.internal.InternalEngine.<span class="built_in">create</span>(InternalEngine.java:<span class="number">404</span>)</div><div class="line">    <span class="keyword">at</span> org.elasticsearch.index.shard.service.InternalIndexShard.<span class="built_in">create</span>(InternalIndexShard.java:<span class="number">403</span>)</div><div class="line">    <span class="keyword">at</span> org.elasticsearch.action.bulk.TransportShardBulkAction.shardIndexOperation(TransportShardBulkAction.java:<span class="number">449</span>)</div><div class="line">    <span class="keyword">at</span> org.elasticsearch.action.bulk.TransportShardBulkAction.shardUpdateOperation(TransportShardBulkAction.java:<span class="number">541</span>)</div><div class="line">    <span class="keyword">at</span> org.elasticsearch.action.bulk.TransportShardBulkAction.shardOperationOnPrimary(TransportShardBulkAction.java:<span class="number">240</span>)</div><div class="line">    <span class="keyword">at</span> org.elasticsearch.action.support.replication.TransportShardReplicationOperationAction$AsyncShardOperationAction.performOnPrimary(TransportShardReplicationOperationAction.java:<span class="number">511</span>)</div><div class="line">    <span class="keyword">at</span> org.elasticsearch.action.support.replication.TransportShardReplicationOperationAction$AsyncShardOperationAction$<span class="number">1.</span>run(TransportShardReplicationOperationAction.java:<span class="number">419</span>)</div><div class="line">    <span class="keyword">at</span> java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:<span class="number">1145</span>)</div><div class="line">    <span class="keyword">at</span> java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:<span class="number">615</span>)</div><div class="line">    <span class="keyword">at</span> java.lang.Thread.run(Thread.java:<span class="number">745</span>)</div><div class="line">Caused <span class="keyword">by</span>: org.apache.lucene.util.BytesRefHash$MaxBytesLengthExceededException: <span class="keyword">bytes</span> can be <span class="keyword">at</span> most <span class="number">32766</span> <span class="operator">in</span> <span class="built_in">length</span>; got <span class="number">40283</span></div><div class="line">    <span class="keyword">at</span> org.apache.lucene.util.BytesRefHash.<span class="built_in">add</span>(BytesRefHash.java:<span class="number">284</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.lucene.index.TermsHashPerField.<span class="built_in">add</span>(TermsHashPerField.java:<span class="number">151</span>)</div><div class="line">    <span class="keyword">at</span> org.apache.lucene.index.DefaultIndexingChain$PerField.invert(DefaultIndexingChain.java:<span class="number">659</span>)</div><div class="line">    ... <span class="number">18</span> more</div></pre></td></tr></table></figure>
+
+<p>意思就是消息的中的某个字段msg 的字段长度 超过了最大设置的值 32766字节。es系统不处理这个消息并抛出异常。  一般是这个字段设置成了not_anayzed,然后长度超出限制了。term 是一个搜索的最小单位，一般不会太大。</p>
+<p>网上找了下解决方案，就是超出的部分就ignore。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">curl -XPUT 'http:<span class="comment">//localhost:9200/twitter' -d '</span></div><div class="line">{</div><div class="line">    <span class="string">"mappings"</span>:{</div><div class="line">        <span class="string">"tweet"</span> : {</div><div class="line">            <span class="string">"properties"</span> : {</div><div class="line">                <span class="string">"message"</span> : {<span class="string">"type"</span> : <span class="string">"string"</span>, <span class="string">"index"</span>:<span class="string">"not_analyzed"</span>,<span class="string">"ignore_above"</span>:<span class="number">256</span> }</div><div class="line">            }</div><div class="line">        }</div><div class="line">    }</div><div class="line">}</div><div class="line">'</div></pre></td></tr></table></figure>
+
+<p>如果这个字段是 index:analyzed的情况就不会出现这个问题。具体要查看你es中设置的mapping。我默认是设置了动态 mapping。将没有指定的filed 设置成了not anaylzed。然后就出来这个长度的限制，修改mapping 搞定。</p>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2015/12/07/linux_bonding_xen_kvm/">
   <time datetime="2015-12-07T13:06:16.000Z">
     12月 7 2015
@@ -797,86 +887,6 @@
 
 
   
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2014/12/04/proxycommand/">
-  <time datetime="2014-12-04T10:38:49.000Z">
-    12月 4 2014
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2014/12/04/proxycommand/">通过ProxyCommand 登录远程内网的服务器</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <p>有些机房的服务器为了安全的问题，或者设置了堡垒机，或者有些服务器放置到了内网，对远程管理带来了不方便。<br>像一些支持分布式的程序，如监控程序Zabbix可以将内网的监控信息数据通过代理传到主控端。但远程的ssh操作的比较麻烦。<br>现发现一种ssh方式，通过ProxyCommand方式可以很好的支持该类型的操作。在内网测试有效。记录如下：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/config </div><div class="line"><span class="comment">#ControlMaster auto</span></div><div class="line"><span class="comment">#ControlPath /tmp/ssh_mux_%h_%p_%r</span></div><div class="line"><span class="comment">#ControlPersist 1h</span></div><div class="line"><span class="comment">#gateways</span></div><div class="line">Host  gateway</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        Hostname <span class="number">192.168</span>.<span class="number">16.230</span></div><div class="line"><span class="comment">#servers</span></div><div class="line">Host <span class="number">192.168</span>.<span class="number">22</span>.*</div><div class="line">        Port <span class="number">65422</span></div><div class="line">        User winupon</div><div class="line">        IdentityFile		   /path/to/ssh/key.pem</div><div class="line">        ProxyCommand ssh gateway nc %h %p</div></pre></td></tr></table></figure>
-
-
-<p>默认读取的时~/.ssh/config 这个文件，可以加上参数，指定不同的文件。<br>gateway 为堡垒机<br>然后192.168.22.* 类型的服务器ip都可以通过堡垒机登录。<br>先要先配置好ssh 互信，或指定key文件</p>
-<p>测试</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ssh gateway -F ~/.ssh/config</div><div class="line">ssh <span class="number">192.168</span>.<span class="number">22.11</span> -F ~/.ssh/config.test </div><div class="line">ssh <span class="number">192.168</span>.<span class="number">22.11</span> -F ~/.ssh/config.test  -vvv 开启调试模式</div></pre></td></tr></table></figure>
-
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
-    <article class="post">
-  <header>
-    
-      <div class="icon"></div>
-      <a href="/2014/12/03/Ansible-Playbooks/">
-  <time datetime="2014-12-03T08:20:12.000Z">
-    12月 3 2014
-  </time>
-</a>
-    
-    
-  
-    <h1 class="title"><a href="/2014/12/03/Ansible-Playbooks/">Ansible学习笔记&lt;二&gt; -Playbooks篇</a></h1>
-  
-
-  </header>
-  
-  <div class="entry">
-    
-      <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> _     _                   ____       __  __           </div><div class="line">| |   (_)_ __  _   ___  __/ ___|___  / _|/ _| ___  ___ </div><div class="line">| |   | | <span class="string">'_ \| | | \ \/ / |   / _ \| |_| |_ / _ \/ _ \</span></div><div class="line">| |___| | | | | |_| |&gt;  &lt;| |__| (_) |  _|  _|  __/  __/</div><div class="line">|_____|_|_| |_|\__,_/_/\_\\____\___/|_| |_|  \___|\___|</div></pre></td></tr></table></figure>
-
-<p>Ansible，官方的解释是：Ansible is the simplest way to automate IT.<br>Ansible 是通过 Python 语言开发。当前使用 Ansible 的用户有：Evernote、EA、rackspace、NASA、Atlassian、Twitter 等。<br>Ansible 默认通过 SSH 协议管理机器。在被控机器上不需要安装任何组件，需要的Python一般的Linux服务器都已经自带了。是一种比Puppet、SaltStack等更加轻量级的自动化运维管理工具。自带的模块也极其丰富。<br>Ansible 使用一个高质量的 Python 实现的 OpenSSH 协议库 “paramiko”。 Paramiko 遵循 SSH2 协议，支持以加密和认证的方式，进行远程服务器的连接。对 paramiko 进行了更高层次的封装。<a href="http://www.paramiko.org/" target="_blank" rel="external">http://www.paramiko.org/</a><br>Ansible 使用  YAML 文件格式并使用 Jinja2 模板语言。</p>
-<p>一些相关链接：<br>官方网站：<a href="http://www.ansible.com/index.html" target="_blank" rel="external">http://www.ansible.com</a><br>官方文档：<a href="http://docs.ansible.com/index.html" target="_blank" rel="external">http://docs.ansible.com/index.html</a></p>
-<h2 id="四、Ansible’s_playbooks">四、Ansible’s playbooks</h2>
-<p>playbooks 翻译过来就是剧本，我们只要写好剧本，就会按照剧本进行演出。只要定义好远程服务器需要达到某种状态，Ansible就会去处理。</p>
-
-    
-  </div>
-  <footer class="end-sep">
-    
-      
-      
-    
-    <div class="clearfix"></div>
-  </footer>
-</article>
-
-
-  
 
   <nav id="pagination">
   
@@ -890,7 +900,7 @@
   </div>
   <footer id="footer"><div class="copyright">
   
-  &copy; 2015 <a href="/">hzchenkj</a>
+  &copy; 2016 <a href="/">hzchenkj</a>
   
 </div>
 <div class="theme-copyright">

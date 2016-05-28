@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>LinuxCoffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="hzchenkj">
+  
+  
+    <meta name="description" content="title: logstsh-if-conf.ddate: 2016-05-28 14:57:55
+tags:logstash
+一般情况下，logstash 测试和运行环境存在区别的。为了方便，logstash 测试的时候会使用如下命令：
+1/opt/logstash/bin/logstash -f /opt/logstash/conf.d/test.conf
+
+测试没有问题。然后就会使用如下方式">
+  
+  <meta name="description" content="title: logstsh-if-conf.ddate: 2016-05-28 14:57:55
+tags:logstash
+一般情况下，logstash 测试和运行环境存在区别的。为了方便，logstash 测试的时候会使用如下命令：
+1/opt/logstash/bin/logstash -f /opt/logstash/conf.d/test.conf
+
+测试没有问题。然后就会使用如下方式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LinuxCoffee">
+<meta property="og:url" content="http://hzchenkj.github.com/2016/05/28/logstsh-if-conf-d/">
+<meta property="og:site_name" content="LinuxCoffee">
+<meta property="og:description" content="title: logstsh-if-conf.ddate: 2016-05-28 14:57:55
+tags:logstash
+一般情况下，logstash 测试和运行环境存在区别的。为了方便，logstash 测试的时候会使用如下命令：
+1/opt/logstash/bin/logstash -f /opt/logstash/conf.d/test.conf
+
+测试没有问题。然后就会使用如下方式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LinuxCoffee">
+<meta name="twitter:description" content="title: logstsh-if-conf.ddate: 2016-05-28 14:57:55
+tags:logstash
+一般情况下，logstash 测试和运行环境存在区别的。为了方便，logstash 测试的时候会使用如下命令：
+1/opt/logstash/bin/logstash -f /opt/logstash/conf.d/test.conf
+
+测试没有问题。然后就会使用如下方式">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LinuxCoffee</a></h1>
+    <p><a href="/">东写西读</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+        <li><a href="/reading">Reading</a></li>
+      
+        <li><a href="/about">About</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content"><article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2016/05/28/logstsh-if-conf-d/">
+  <time datetime="2016-05-28T07:10:53.000Z">
+    5月 28 2016
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>title: logstsh-if-conf.d<br>date: 2016-05-28 14:57:55</p>
+<h2 id="tags:logstash">tags:logstash</h2>
+<p>一般情况下，logstash 测试和运行环境存在区别的。<br>为了方便，logstash 测试的时候会使用如下命令：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/<span class="keyword">opt</span>/logstash/bin/logstash -<span class="keyword">f</span> /<span class="keyword">opt</span>/logstash/<span class="keyword">conf</span>.<span class="keyword">d</span>/test.<span class="keyword">conf</span></div></pre></td></tr></table></figure>
+
+<p>测试没有问题。然后就会使用如下方式:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">service</span> <span class="title">logstash</span> restart</span></div></pre></td></tr></table></figure>
+
+<p>让logstash  程序读取conf.d 目录下所有conf文件，然后启动程序。<br>这样就会带来一个问题，conf.d的文件 会被加载一个logstash 进程运行，多个conf 文件没有相互隔离。会出现测试时候不存在的问题。<br>解决方法：</p>
+<p>1 使用 测试方法，将多个conf文件分开运行，写到脚本中</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">/<span class="keyword">opt</span>/logstash/bin/logstash -<span class="keyword">f</span> /<span class="keyword">opt</span>/logstash/<span class="keyword">conf</span>.<span class="keyword">d</span>/test1.<span class="keyword">conf</span></div><div class="line">/<span class="keyword">opt</span>/logstash/bin/logstash -<span class="keyword">f</span> /<span class="keyword">opt</span>/logstash/<span class="keyword">conf</span>.<span class="keyword">d</span>/test2.<span class="keyword">conf</span></div></pre></td></tr></table></figure>
+
+<p>2 在配置文件中增加tag并做好if判断</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">input </div><div class="line">  file {</div><div class="line">     <span class="variable">type =</span>&gt; <span class="string">"app-log"</span></div><div class="line">     <span class="variable">path =</span>&gt; [ <span class="string">"/data/*.log"</span> ]</div><div class="line">     <span class="variable">start_position =</span>&gt; <span class="string">"beginning"</span></div><div class="line">     <span class="variable">codec =</span>&gt; multiline {</div><div class="line">       <span class="variable">pattern =</span>&gt; <span class="string">"^%{TIMESTAMP_ISO8601} "</span></div><div class="line">       <span class="variable">negate =</span>&gt; <span class="constant">true</span></div><div class="line">       <span class="variable">what =</span>&gt; previous</div><div class="line">     }</div><div class="line">   }</div><div class="line"></div><div class="line">   file {</div><div class="line">     <span class="variable">type =</span>&gt; <span class="string">"app-access-log"</span></div><div class="line">     <span class="variable">path =</span>&gt; [ <span class="string">"/data/*.log"</span> ]</div><div class="line">   } </div><div class="line">}</div><div class="line">   </div><div class="line">output {</div><div class="line">	<span class="keyword">if</span> ([type] <span class="keyword">in</span> [<span class="string">"app-log"</span>, <span class="string">"app-access-log"</span>]) {</div><div class="line">    </div><div class="line">   }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>logstash 在生产环境，一般是用service方式运行，或者使用supervisord来运行。 </p>
+
+    
+  </div>
+  <footer>
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="">
+  </div>
+</section>
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2016 <a href="/">hzchenkj</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="http://ajax.useso.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'hzchenkj' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>
