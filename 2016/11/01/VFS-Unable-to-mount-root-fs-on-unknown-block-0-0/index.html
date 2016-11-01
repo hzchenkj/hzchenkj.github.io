@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  
+  <title>VFS: Unable to mount root fs on unknown-block(0,0). | LinuxCoffee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+    <meta name="author" content="hzchenkj">
+  
+  
+    <meta name="description" content="由于内核脏牛漏洞，可以从本地普通用户很容易就提权到root。是一个及其危险的漏洞，故在官方发布漏洞补丁第一时间进行升级内核，但CentOS的系统的内核补丁，需要重启服务器后生效。
+其中一台服务器升级重启后，出现错误”VFS: Unable to mount root fs on unknown-block(0,0).” 导致启动不了，分析了下，应该是到了grub阶段就挂了。但在使用修复模式选择原来">
+  
+  <meta name="description" content="由于内核脏牛漏洞，可以从本地普通用户很容易就提权到root。是一个及其危险的漏洞，故在官方发布漏洞补丁第一时间进行升级内核，但CentOS的系统的内核补丁，需要重启服务器后生效。
+其中一台服务器升级重启后，出现错误”VFS: Unable to mount root fs on unknown-block(0,0).” 导致启动不了，分析了下，应该是到了grub阶段就挂了。但在使用修复模式选择原来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VFS: Unable to mount root fs on unknown-block(0,0).">
+<meta property="og:url" content="http://hzchenkj.github.com/2016/11/01/VFS-Unable-to-mount-root-fs-on-unknown-block-0-0/">
+<meta property="og:site_name" content="LinuxCoffee">
+<meta property="og:description" content="由于内核脏牛漏洞，可以从本地普通用户很容易就提权到root。是一个及其危险的漏洞，故在官方发布漏洞补丁第一时间进行升级内核，但CentOS的系统的内核补丁，需要重启服务器后生效。
+其中一台服务器升级重启后，出现错误”VFS: Unable to mount root fs on unknown-block(0,0).” 导致启动不了，分析了下，应该是到了grub阶段就挂了。但在使用修复模式选择原来">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="VFS: Unable to mount root fs on unknown-block(0,0).">
+<meta name="twitter:description" content="由于内核脏牛漏洞，可以从本地普通用户很容易就提权到root。是一个及其危险的漏洞，故在官方发布漏洞补丁第一时间进行升级内核，但CentOS的系统的内核补丁，需要重启服务器后生效。
+其中一台服务器升级重启后，出现错误”VFS: Unable to mount root fs on unknown-block(0,0).” 导致启动不了，分析了下，应该是到了grub阶段就挂了。但在使用修复模式选择原来">
+
+  
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div class="wrapper">
+    <header id="header">
+  <div class="title">
+    <h1><a href="/">LinuxCoffee</a></h1>
+    <p><a href="/">东写西读</a></p>
+  </div>
+  <nav class="nav">
+    <ul>
+      
+        <li><a href="/archives">Archives</a></li>
+      
+        <li><a href="/reading">Reading</a></li>
+      
+        <li><a href="/about">About</a></li>
+      
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+  <div class="clearfix"></div>
+</header>
+    <div class="content"><article class="post">
+  <header>
+    
+      <div class="icon"></div>
+      <a href="/2016/11/01/VFS-Unable-to-mount-root-fs-on-unknown-block-0-0/">
+  <time datetime="2016-11-01T15:02:01.000Z">
+    11月 1 2016
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title">VFS: Unable to mount root fs on unknown-block(0,0).</h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>由于内核脏牛漏洞，可以从本地普通用户很容易就提权到root。是一个及其危险的漏洞，故在官方发布漏洞补丁第一时间进行升级内核，但CentOS的系统的内核补丁，需要重启服务器后生效。</p>
+<p>其中一台服务器升级重启后，出现错误”VFS: Unable to mount root fs on unknown-block(0,0).” 导致启动不了，分析了下，应该是到了grub阶段就挂了。<br>但在使用修复模式选择原来老的内核grub菜单，可以引导进入系统。</p>
+<p>仔细排查后发现在/boot 分区下initramfs-2.6.32-642.6.2.el6.x86_64.img 这个新的内核的镜像文件没有生成。并且在/boot/grub/grub.conf 文件中也少了一行</p>
+<p>initrd /initramfs-2.6.32-642.6.2.el6.x86_64.img</p>
+<p>用dracut 生成img文件<br>dracut -f /boot/initramfs-2.6.32-642.6.2.el6.x86_64.img 2.6.32-642.6.2.el6.x86_64   </p>
+<p>然后手工修改grub.conf 文件，重启就可以了。</p>
+<p>原先的服务器boot 分区设置只有100M，导致在升级内核空间不够。没有生成img文件并增加grub文件配置引起错误。</p>
+<p>在升级了内核后，两个内核空间占用了98M的空间。但此时还空间还没有满。</p>
+<p>在启动过程中，同时会产生一个initrd-2.6.32-642.6.2.el6.x86_64kdump.img 也会占用空间。在启动新内核的时候生成这个文件的时候空间不足，导致启动失败。而在切回到原来旧内核的时候，会继续使用原先老的dump文件的空间。空间就不会扩展。能成功启动。</p>
+<p>》》》</p>
+<p>以后尽量将boot分区空间设置大一点，至少保留500M的样子，可以同时并行保持2，3个内核，出现问题，也可以回滚到上一个内核进行处理。</p>
+
+    
+  </div>
+  <footer>
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+  <div class="ds-thread" data-title="VFS: Unable to mount root fs on unknown-block(0,0).">
+  </div>
+</section>
+</div>
+  </div>
+  <footer id="footer"><div class="copyright">
+  
+  &copy; 2016 <a href="/">hzchenkj</a>
+  
+</div>
+<div class="theme-copyright">
+  Theme by <a href="https://github.com/orderedlist" target="_blank">orderedlist</a>
+   | 
+  Redesign by <a href="http://heroicyang.com/" target="_blank">Heroic Yang</a>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="http://ajax.useso.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+<script src="/js/scale.fix.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+<script type="text/javascript">
+  var duoshuoQuery = { short_name: 'hzchenkj' };
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';
+    ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script>
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+  (function($){
+    $('.fancybox').fancybox();
+  })(jQuery);
+</script>
+
+
+</body>
+</html>

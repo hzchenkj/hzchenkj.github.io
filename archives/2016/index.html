@@ -62,6 +62,50 @@
   <header>
     
       <div class="icon"></div>
+      <a href="/2016/11/01/VFS-Unable-to-mount-root-fs-on-unknown-block-0-0/">
+  <time datetime="2016-11-01T15:02:01.000Z">
+    11月 1 2016
+  </time>
+</a>
+    
+    
+  
+    <h1 class="title"><a href="/2016/11/01/VFS-Unable-to-mount-root-fs-on-unknown-block-0-0/">VFS: Unable to mount root fs on unknown-block(0,0).</a></h1>
+  
+
+  </header>
+  
+  <div class="entry">
+    
+      <p>由于内核脏牛漏洞，可以从本地普通用户很容易就提权到root。是一个及其危险的漏洞，故在官方发布漏洞补丁第一时间进行升级内核，但CentOS的系统的内核补丁，需要重启服务器后生效。</p>
+<p>其中一台服务器升级重启后，出现错误”VFS: Unable to mount root fs on unknown-block(0,0).” 导致启动不了，分析了下，应该是到了grub阶段就挂了。<br>但在使用修复模式选择原来老的内核grub菜单，可以引导进入系统。</p>
+<p>仔细排查后发现在/boot 分区下initramfs-2.6.32-642.6.2.el6.x86_64.img 这个新的内核的镜像文件没有生成。并且在/boot/grub/grub.conf 文件中也少了一行</p>
+<p>initrd /initramfs-2.6.32-642.6.2.el6.x86_64.img</p>
+<p>用dracut 生成img文件<br>dracut -f /boot/initramfs-2.6.32-642.6.2.el6.x86_64.img 2.6.32-642.6.2.el6.x86_64   </p>
+<p>然后手工修改grub.conf 文件，重启就可以了。</p>
+<p>原先的服务器boot 分区设置只有100M，导致在升级内核空间不够。没有生成img文件并增加grub文件配置引起错误。</p>
+<p>在升级了内核后，两个内核空间占用了98M的空间。但此时还空间还没有满。</p>
+<p>在启动过程中，同时会产生一个initrd-2.6.32-642.6.2.el6.x86_64kdump.img 也会占用空间。在启动新内核的时候生成这个文件的时候空间不足，导致启动失败。而在切回到原来旧内核的时候，会继续使用原先老的dump文件的空间。空间就不会扩展。能成功启动。</p>
+<p>》》》</p>
+<p>以后尽量将boot分区空间设置大一点，至少保留500M的样子，可以同时并行保持2，3个内核，出现问题，也可以回滚到上一个内核进行处理。</p>
+
+    
+  </div>
+  <footer class="end-sep">
+    
+      
+      
+    
+    <div class="clearfix"></div>
+  </footer>
+</article>
+
+
+  
+    <article class="post">
+  <header>
+    
+      <div class="icon"></div>
       <a href="/2016/05/28/logstsh-if-conf-d/">
   <time datetime="2016-05-28T07:10:53.000Z">
     5月 28 2016
